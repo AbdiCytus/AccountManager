@@ -1,38 +1,24 @@
 // lib/authOptions.ts
+import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google"; // 1. Import Provider
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
-    // 2. Tambahkan GoogleProvider ke dalam array
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
-    // Kamu bisa tetap membiarkan CredentialsProvider di sini jika ingin dual login
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
-  // Opsional: Callbacks untuk kustomisasi data
+  session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user, account }) {
-      // Saat login sukses dengan Google, 'account' & 'user' akan tersedia
-      if (account && user) {
-        // Kita bisa simpan data tambahan jika perlu
-        token.id = user.id;
-      }
-      return token;
-    },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-      }
+      if (session.user && token.sub) session.user.id = token.sub;
       return session;
     },
   },
-  pages: {
-    signIn: "/login",
-  },
+  pages: { signIn: "/login" },
 };

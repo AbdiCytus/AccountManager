@@ -1,12 +1,7 @@
-// components/SessionProvider.tsx
-"use client"; // Wajib karena menggunakan React Context
+"use client";
 
-import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
+import { SessionProvider as Session } from "next-auth/react";
+type Provider = { children: React.ReactNode };
 
-export default function Providers({ 
-  children 
-}: { 
-  children: React.ReactNode 
-}) {
-  return <NextAuthSessionProvider>{children}</NextAuthSessionProvider>;
-}
+const Providers = ({ children }: Provider) => <Session>{children}</Session>;
+export default Providers;
