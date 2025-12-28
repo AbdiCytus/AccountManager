@@ -7,37 +7,34 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- MODEL BAWAAN NEXTAUTH (Jangan diubah dulu) ---
-
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
- 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  savedAccounts SavedAccount[]
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? 
-  access_token       String? 
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? 
-  session_state      String?
- 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
@@ -55,4 +52,21 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model SavedAccount {
+  id                String   @id @default(cuid())
+  
+  platformName      String   // Misal: "Facebook", "Genshin Impact"
+  username          String   // Misal: "traveler123"
+  encryptedPassword String   // 🔒 Password yang sudah diacak (BUKAN TEXT BIASA)
+  
+  category          String   @default("Other") // "Game", "Social", "Work"
+  websiteUrl        String?  // Opsional, buat simpan link login
+  notes             String?  // Catatan tambahan
+
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
