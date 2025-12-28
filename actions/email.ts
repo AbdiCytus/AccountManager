@@ -104,3 +104,50 @@ export async function deleteEmail(id: string) {
     return { success: false, message: "Gagal hapus email" };
   }
 }
+
+// 5. AMBIL DETAIL EMAIL (+ AKUN TERHUBUNG)
+export async function getEmailById(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return null;
+
+  return await prisma.emailIdentity.findUnique({
+    where: { id, userId: session.user.id },
+    include: {
+      recoveryEmail: { select: { email: true } },
+      linkedAccounts: true, // Ambil semua akun anak
+    },
+  });
+}
+
+// 6. TOGGLE VERIFIKASI EMAIL
+export async function toggleEmailVerification(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return { success: false, message: "Unauthorized" };
+
+  try {
+    const email = await prisma.emailIdentity.findUnique({
+      where: { id, userId: session.user.id },
+      select: { isVerified: true },
+    });
+
+    if (!email) return { success: false, message: "Email tidak ditemukan" };
+
+    // Ubah status kebalikannya (True <-> False)
+    // Catatan: Di aplikasi real, ini harusnya mengirim email.
+    // Untuk tahap ini kita buat switch manual dulu agar UI bekerja.
+    await prisma.emailIdentity.update({
+      where: { id },
+      data: { isVerified: !email.isVerified },
+    });
+
+    revalidatePath(`/dashboard/email/${id}`);
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      message: email.isVerified ? "Verifikasi dicabut" : "Email terverifikasi",
+    };
+  } catch (error) {
+    console.error("Gagal update status", error)
+    return { success: false, message: "Gagal update status" };
+  }
+}
