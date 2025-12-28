@@ -6,7 +6,12 @@ import { authOptions } from "@/lib/auth";
 import { encrypt } from "@/lib/crypto";
 import { revalidatePath } from "next/cache";
 
-export async function addAccount(formData: FormData) {
+interface ActionResponse {
+  success: boolean;
+  message: string;
+}
+
+export async function addAccount(formData: FormData): Promise<ActionResponse> {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id)
     return { success: false, message: "Login dulu!" };
@@ -30,6 +35,7 @@ export async function addAccount(formData: FormData) {
         userId: session.user.id,
       },
     });
+    return { success: true, message: "Data berhasil ditambahkan!" };
   } catch (err) {
     console.error("Gagal simpan akun:", err);
     return { success: false, message: "Terjadi kesalahan server." };

@@ -8,8 +8,8 @@ export default function Navbar() {
 
   if (session && session.user) {
     return (
-      <nav className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-3 bg-gray-800 py-3 px-4 rounded-lg">
+      <nav className="flex items-center justify-between p-4 border-b bg-gray-100 shadow-sm">
+        <div className="flex items-center gap-3 bg-white shadow-sm py-3 px-4 rounded-lg">
           {/* Tampilkan Foto Profil Google */}
           {session.user.image && (
             <Image
@@ -22,7 +22,7 @@ export default function Navbar() {
           )}
 
           <div>
-            <p className="font-bold">{session.user.name}</p>
+            <p className="font-bold text-black">{session.user.name}</p>
             <p className="text-xs text-gray-500">{session.user.email}</p>
           </div>
         </div>
