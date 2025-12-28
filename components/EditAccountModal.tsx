@@ -45,7 +45,7 @@ export default function EditAccountModal({ account }: EditProps) {
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
+          <div className="w-full mx-auto bg-white dark:bg-gray-800 rounded-xl max-w-md shadow-2xl overflow-hidden">
             <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 dark:border-gray-700 flex justify-between items-center">
               <h3 className="font-bold text-lg text-gray-800 dark:text-white">
                 Edit Akun
@@ -57,7 +57,7 @@ export default function EditAccountModal({ account }: EditProps) {
               </button>
             </div>
 
-            <form action={handleSubmit} className="p-6 space-y-4">
+            <form action={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
               <input
                 type="hidden"
                 className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white border dark:border-gray-700"

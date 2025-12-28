@@ -29,14 +29,14 @@ export default function AddAccountModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors shadow-sm hover:shadow-md">
+        className="w-full sm:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors shadow-sm hover:shadow-md">
         <PlusIcon className="w-5 h-5" />
         <span>Tambah Akun</span>
       </button>
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-2xl overflow-hidden transition-colors">
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full mx-auto max-w-md shadow-2xl overflow-hidden transition-colors">
             <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 dark:border-gray-700 flex justify-between items-center">
               <h3 className="font-bold text-lg text-gray-800 dark:text-white">
                 Simpan Akun Baru
@@ -48,7 +48,7 @@ export default function AddAccountModal() {
               </button>
             </div>
 
-            <form action={handleSubmit} className="p-6 space-y-4">
+            <form action={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Platform / Nama Layanan
