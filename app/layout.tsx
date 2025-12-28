@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 import Providers from "@/components/Providers";
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: Props) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <Navbar />
+          <Toaster position="top-center" reverseOrder={false} />
           {children}
         </Providers>
       </body>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateAccount } from "@/actions/account"; // Import action baru
 import { PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
 
 type EditProps = {
   account: {
@@ -25,10 +26,11 @@ export default function EditAccountModal({ account }: EditProps) {
     setIsLoading(false);
 
     if (result?.success) {
+      toast.success("Perubahan disimpan!");
       setIsOpen(false);
       router.refresh();
     } else {
-      alert(result?.message || "Gagal update");
+      toast.error(result?.message || "Gagal update");
     }
   }
 

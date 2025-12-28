@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { addAccount } from "@/actions/account"; // Import Server Action
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import toast from "react-hot-toast"
 
 export default function AddAccountModal() {
   const router = useRouter();
@@ -20,9 +21,9 @@ export default function AddAccountModal() {
 
     if (result.success == true) {
       setIsOpen(false);
-      alert(result.message);
+      toast.success("Akun berhasil ditambahkan!")
       router.refresh();
-    } else alert(result.message);
+    } else toast.error(result?.message || "Gagal menyimpan")
   }
 
   return (

@@ -2,8 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { getAccountPassword, deleteAccount } from "@/actions/account";
-import { useRouter } from "next/navigation";
+import { getAccountPassword } from "@/actions/account";
 import {
   TrashIcon,
   ClipboardDocumentIcon,
@@ -12,6 +11,8 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 import EditAccountModal from "./EditAccountModal";
+import DeleteAccountModal from "./DeleteAccountModal";
+import toast from "react-hot-toast";
 
 interface AccountProps {
   id: string;
@@ -26,12 +27,11 @@ export default function AccountCard({
   username,
   category,
 }: AccountProps) {
-  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   // State untuk feedback visual saat copy
   const [isCopiedUser, setIsCopiedUser] = useState(false);
@@ -49,7 +49,7 @@ export default function AccountCard({
       if (result.success) {
         setPassword(result.password);
         setIsVisible(true);
-      } else alert("Gagal mengambil password");
+      } else toast.error("Gagal mengambil password");
     }
   }
 
@@ -59,39 +59,29 @@ export default function AccountCard({
     // Logika Feedback: Ubah icon jadi centang selama 2 detik
     if (type === "user") {
       setIsCopiedUser(true);
+      toast.success("Username disalin!");
       setTimeout(() => setIsCopiedUser(false), 2000);
     } else {
       setIsCopiedPass(true);
+      toast.success("Password disalin!");
       setTimeout(() => setIsCopiedPass(false), 2000);
-    }
-  }
-
-  async function handleDelete() {
-    if (confirm("Yakin ingin menghapus akun ini?")) {
-      setIsDeleting(true);
-      const result = await deleteAccount(id);
-      if (result.success) router.refresh();
-      else {
-        alert("Gagal menghapus");
-        setIsDeleting(false);
-      }
     }
   }
 
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all relative group">
       <EditAccountModal account={{ id, platformName, username, category }} />
+      <DeleteAccountModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        account={{ id, platformName }}
+      />
       {/* Tombol Delete dengan Icon */}
       <button
-        onClick={handleDelete}
-        disabled={isDeleting}
+        onClick={() => setIsDeleteOpen(true)} // 👈 Buka modal saat diklik
         className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
         title="Hapus Akun">
-        {isDeleting ? (
-          <span className="text-xs">...</span>
-        ) : (
-          <TrashIcon className="w-5 h-5" />
-        )}
+        <TrashIcon className="w-5 h-5" />
       </button>
 
       <div className="flex items-center gap-2 mb-3">
