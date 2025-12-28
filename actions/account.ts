@@ -42,18 +42,29 @@ export async function addAccount(formData: FormData): Promise<ActionResponse> {
   }
 }
 
-export async function getAccounts() {
+export async function getAccounts(query?: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id) return [];
+
   try {
     const accounts = await prisma.savedAccount.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
+      where: {
+        userId: session.user.id,
+        ...(query && {
+          OR: [
+            { platformName: { contains: query, mode: "insensitive" } },
+            { username: { contains: query, mode: "insensitive" } },
+          ],
+        }),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return accounts;
-  } catch (err) {
-    console.error("Gagal ambil data:", err);
+  } catch (error) {
+    console.error("Gagal ambil data:", error);
     return [];
   }
 }

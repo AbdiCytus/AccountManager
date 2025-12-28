@@ -35,7 +35,6 @@ export default function AddAccountModal() {
         <span>Tambah Akun</span>
       </button>
 
-      {/* MODAL (Hanya muncul jika isOpen = true) */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden">

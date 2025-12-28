@@ -4,21 +4,20 @@
 import { useState } from "react";
 import { getAccountPassword, deleteAccount } from "@/actions/account";
 import { useRouter } from "next/navigation";
-// 👇 Import icon yang dibutuhkan
 import {
   TrashIcon,
   ClipboardDocumentIcon,
   EyeIcon,
   EyeSlashIcon,
-  CheckIcon, // Icon centang untuk feedback user
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 
-type AccountProps = {
+interface AccountProps {
   id: string;
   platformName: string;
   username: string;
   category: string;
-};
+}
 
 export default function AccountCard({
   id,
@@ -49,9 +48,7 @@ export default function AccountCard({
       if (result.success) {
         setPassword(result.password);
         setIsVisible(true);
-      } else {
-        alert("Gagal mengambil password");
-      }
+      } else alert("Gagal mengambil password");
     }
   }
 
@@ -72,9 +69,8 @@ export default function AccountCard({
     if (confirm("Yakin ingin menghapus akun ini?")) {
       setIsDeleting(true);
       const result = await deleteAccount(id);
-      if (result.success) {
-        router.refresh();
-      } else {
+      if (result.success) router.refresh();
+      else {
         alert("Gagal menghapus");
         setIsDeleting(false);
       }
