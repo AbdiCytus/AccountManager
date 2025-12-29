@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@/app/generated/prisma/client";
 
 // 1. TAMBAH GROUP
 export async function addGroup(formData: FormData) {
@@ -31,12 +32,19 @@ export async function addGroup(formData: FormData) {
 }
 
 // 2. AMBIL SEMUA GROUP (Untuk Dropdown & Dashboard)
-export async function getGroups() {
+export async function getGroups(query?: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return [];
 
+  const whereCondition: Prisma.AccountGroupWhereInput = {
+    userId: session.user.id,
+  };
+  if (query) {
+    whereCondition.name = { contains: query, mode: "insensitive" };
+  }
+
   return await prisma.accountGroup.findMany({
-    where: { userId: session.user.id },
+    where: whereCondition,
     include: { _count: { select: { accounts: true } } }, // Hitung jumlah akun di dalamnya
     orderBy: { createdAt: "asc" },
   });

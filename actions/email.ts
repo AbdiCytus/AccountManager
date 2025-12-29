@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/crypto";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@/app/generated/prisma/client";
 
 // 1. TAMBAH EMAIL BARU
 export async function addEmail(formData: FormData) {
@@ -53,15 +54,24 @@ export async function addEmail(formData: FormData) {
 }
 
 // 2. AMBIL DAFTAR EMAIL
-export async function getEmails() {
+export async function getEmails(query?: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return [];
 
+  const whereCondition: Prisma.EmailIdentityWhereInput = {
+    userId: session.user.id,
+  };
+  if (query) {
+    whereCondition.OR = [
+      { email: { contains: query, mode: "insensitive" } },
+      { name: { contains: query, mode: "insensitive" } },
+    ];
+  }
+
   const emails = await prisma.emailIdentity.findMany({
-    where: { userId: session.user.id },
-    include: {
-      recoveryEmail: { select: { email: true } }, // Ambil info email pemulih
-      _count: { select: { linkedAccounts: true } }, // Hitung anak akun
+    where: whereCondition,
+    include: { // Ambil info email pemulih
+      _count: { select: { linkedAccounts: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -147,7 +157,7 @@ export async function toggleEmailVerification(id: string) {
       message: email.isVerified ? "Verifikasi dicabut" : "Email terverifikasi",
     };
   } catch (error) {
-    console.error("Gagal update status", error)
+    console.error("Gagal update status", error);
     return { success: false, message: "Gagal update status" };
   }
 }

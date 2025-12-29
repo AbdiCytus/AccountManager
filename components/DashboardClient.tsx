@@ -1,7 +1,7 @@
 // components/DashboardClient.tsx
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { UserIcon, EnvelopeIcon } from "@heroicons/react/24/solid";
 import AccountCard from "./AccountCard";
 import GroupCard from "./GroupCard";
@@ -41,8 +41,17 @@ export default function DashboardClient({
   emails,
   query,
 }: DashboardProps) {
-  // State Toggle: 'accounts' atau 'emails'
-  const [viewMode, setViewMode] = useState<"accounts" | "emails">("accounts");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const activeTab =
+    searchParams.get("tab") === "emails" ? "emails" : "accounts";
+
+  const handleTabChange = (tab: "accounts" | "emails") => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", tab);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <div className="space-y-6">
@@ -50,9 +59,9 @@ export default function DashboardClient({
       <div className="flex justify-center">
         <div className="bg-gray-100 dark:bg-gray-700 p-1 rounded-xl flex gap-1 shadow-inner">
           <button
-            onClick={() => setViewMode("accounts")}
+            onClick={() => handleTabChange("accounts")}
             className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${
-              viewMode === "accounts"
+              activeTab === "accounts"
                 ? "bg-white dark:bg-gray-800 text-blue-600 shadow-sm"
                 : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}>
@@ -60,9 +69,9 @@ export default function DashboardClient({
             Akun & Group
           </button>
           <button
-            onClick={() => setViewMode("emails")}
+            onClick={() => handleTabChange("emails")}
             className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${
-              viewMode === "emails"
+              activeTab === "emails"
                 ? "bg-white dark:bg-gray-800 text-purple-600 shadow-sm"
                 : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}>
@@ -73,11 +82,11 @@ export default function DashboardClient({
       </div>
 
       {/* 2. AREA KONTEN */}
-      {viewMode === "accounts" ? (
+      {activeTab === "accounts" ? (
         /* --- MODE AKUN --- */
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Section Group (Hanya tampil jika ada group) */}
-          {groups.length > 0 && !query && (
+          {/* Section Group */}
+          {groups.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {groups.map((group) => (
                 <GroupCard
@@ -90,12 +99,14 @@ export default function DashboardClient({
             </div>
           )}
 
-          {/* Section Akun */}
+          {/* Section Akun (Hanya yang tidak masuk grup) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {accounts.length === 0 && groups.length === 0 ? (
               <div className="col-span-full text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
                 <p className="text-gray-500">
-                  Belum ada akun atau grup yang disimpan.
+                  {query
+                    ? `Tidak ada akun/grup dengan kata kunci "${query}"`
+                    : "Belum ada akun atau grup."}
                 </p>
               </div>
             ) : (
@@ -105,8 +116,7 @@ export default function DashboardClient({
                   id={acc.id}
                   platformName={acc.platformName}
                   username={acc.username}
-                  category={acc.categories[0] || "Other"}
-                  // Nanti kita update AccountCard utk terima props email
+                  category={acc.categories?.[0] || "Other"}
                 />
               ))
             )}
@@ -118,7 +128,9 @@ export default function DashboardClient({
           {emails.length === 0 ? (
             <div className="col-span-full text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
               <p className="text-gray-500">
-                Belum ada email master yang disimpan.
+                {query
+                  ? `Tidak ada email dengan kata kunci "${query}"`
+                  : "Belum ada email master."}
               </p>
             </div>
           ) : (

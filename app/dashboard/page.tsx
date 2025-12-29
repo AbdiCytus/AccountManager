@@ -8,11 +8,10 @@ import { getEmails } from "@/actions/email";
 import { getGroups } from "@/actions/group";
 
 import AddDataModal from "@/components/AddDataModal";
-import AccountCard from "@/components/AccountCard";
 import SearchInput from "@/components/SearchInput";
 import DashboardClient from "@/components/DashboardClient";
 
-type Props = { searchParams: Promise<{ q?: string }> };
+type Props = { searchParams: Promise<{ q?: string; tab?: string }> };
 
 export default async function DashboardPage(props: Props) {
   const searchParams = await props.searchParams;
@@ -24,8 +23,8 @@ export default async function DashboardPage(props: Props) {
   // Fetch semua data secara paralel agar cepat
   const [accounts, emails, groups] = await Promise.all([
     getAccounts(query),
-    getEmails(),
-    getGroups(),
+    getEmails(query),
+    getGroups(query),
   ]);
 
   return (
