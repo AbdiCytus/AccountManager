@@ -146,6 +146,7 @@ export async function updateEmail(formData: FormData) {
   if (!session?.user?.id) return { success: false, message: "Unauthorized" };
 
   const id = formData.get("id") as string;
+  const newEmail = formData.get("email") as string;
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -154,8 +155,25 @@ export async function updateEmail(formData: FormData) {
   const phoneNumber = formData.get("phoneNumber") as string;
   const recoveryEmailId = formData.get("recoveryEmailId") as string;
 
+  const currentData = await prisma.emailIdentity.findUnique({
+    where: { id, userId: session.user.id },
+  });
+
   // Validasi dasar
+  if (!currentData) return { success: false, message: "Data tidak ditemukan" };
   if (!email) return { success: false, message: "Email wajib diisi" };
+
+  const isEmailChanged = currentData.email !== newEmail;
+
+  // Jika berubah, kita reset status verifikasi
+  let verificationReset = {};
+  if (isEmailChanged) {
+    verificationReset = {
+      isVerified: false,
+      verificationToken: null, 
+      tokenExpiresAt: null,
+    };
+  }
 
   // Logic Password (hanya update jika diisi)
   let passwordUpdate = {};
@@ -194,10 +212,11 @@ export async function updateEmail(formData: FormData) {
     await prisma.emailIdentity.update({
       where: { id, userId: session.user.id },
       data: {
-        name,
-        email,
+        name: formData.get("name") as string,
+        email: newEmail,
         ...passwordUpdate,
         ...twoFactorUpdate,
+        ...verificationReset 
       },
     });
 

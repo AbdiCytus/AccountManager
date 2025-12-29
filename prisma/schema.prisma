@@ -50,8 +50,11 @@ model EmailIdentity {
   recoveringFor   EmailIdentity[] @relation("RecoveryRelation")
 
   // Fitur Verifikasi
-  isVerified        Boolean @default(false) // Ikon Centang/Silang
-  verificationToken String? // Token untuk link verifikasi
+  tokenExpiresAt       DateTime?
+  lastVerificationSent DateTime? 
+  verificationAttempts Int       @default(0) 
+  isVerified           Boolean   @default(false) 
+  verificationToken    String? 
 
   // Relasi ke Akun Platform (The Children)
   linkedAccounts SavedAccount[]

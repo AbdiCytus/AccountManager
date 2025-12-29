@@ -63,7 +63,7 @@ export default async function EmailDetailPage(props: Props) {
               <div className="flex flex-col items-end gap-3">
                 {/* Tombol Verifikasi (Client Component) */}
                 <EmailVerificationButton
-                  id={emailData.id}
+                  emailId={emailData.id}
                   isVerified={emailData.isVerified}
                 />
                 <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default async function EmailDetailPage(props: Props) {
                     Email Pemulih
                   </p>
                   <p
-                    className="font-medium text-gray-800 dark:text-white truncate max-w-[150px]"
+                    className="font-medium text-gray-800 dark:text-white truncate max-w-37.5"
                     title={emailData.recoveryEmail?.email}>
                     {emailData.recoveryEmail?.email || "-"}
                   </p>

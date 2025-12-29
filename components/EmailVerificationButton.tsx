@@ -1,62 +1,81 @@
 "use client";
 
 import { useState } from "react";
-import { toggleEmailVerification } from "@/actions/email";
-import { CheckBadgeIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import {
+  CheckBadgeIcon,
+  ExclamationCircleIcon,
+  PaperAirplaneIcon,
+} from "@heroicons/react/24/solid";
+import { sendVerificationEmail } from "@/actions/verify";
 import toast from "react-hot-toast";
 
-interface Props {
-  id: string;
+type Props = {
+  emailId: string;
   isVerified: boolean;
-}
+};
 
-export default function EmailVerificationButton({ id, isVerified }: Props) {
+export default function EmailVerificationButton({
+  emailId,
+  isVerified,
+}: Props) {
   const [isLoading, setIsLoading] = useState(false);
 
-  async function handleToggle() {
-    setIsLoading(true);
-    // Simulasi mengirim email (Delay 1 detik agar terasa nyata)
-    if (!isVerified) {
-      toast.loading("Mengirim email verifikasi...", { duration: 1000 });
-      await new Promise((r) => setTimeout(r, 1000));
-    }
-
-    const result = await toggleEmailVerification(id);
-    setIsLoading(false);
-
-    if (result.success) {
-      toast.success(result.message);
-    } else {
-      toast.error(result.message);
-    }
-  }
-
+  // Jika sudah verified, tampilkan Badge Hijau statis
   if (isVerified) {
     return (
-      <div className="flex flex-col items-end">
-        <div className="flex items-center gap-2 text-green-600 bg-green-50 dark:bg-green-900/30 px-4 py-2 rounded-lg border border-green-200 dark:border-green-800">
-          <CheckBadgeIcon className="w-6 h-6" />
-          <span className="font-bold">Terverifikasi</span>
-        </div>
-        <button
-          onClick={handleToggle}
-          disabled={isLoading}
-          className="text-xs text-gray-400 mt-2 hover:text-red-500 transition-colors underline">
-          Batalkan Verifikasi (Debug)
-        </button>
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium border border-green-200 dark:border-green-800 cursor-default">
+        <CheckBadgeIcon className="w-5 h-5" />
+        <span>Terverifikasi</span>
       </div>
     );
   }
 
+  // Handler Kirim Email
+  async function handleSendVerification() {
+    setIsLoading(true);
+    const result = await sendVerificationEmail(emailId);
+
+    if (result.success) {
+      toast.success(result.message, { duration: 5000 });
+    } else {
+      toast.error(result.message);
+    }
+    setIsLoading(false);
+  }
+
+  // Jika belum verified, tampilkan Tombol Aktif
   return (
     <button
-      onClick={handleToggle}
+      onClick={handleSendVerification}
       disabled={isLoading}
-      className="flex items-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 dark:bg-gray-800 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20 px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50">
-      <XCircleIcon className="w-6 h-6" />
-      <span className="font-medium">
-        {isLoading ? "Memproses..." : "Verifikasi Sekarang"}
-      </span>
+      className="group flex items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 rounded-lg text-sm font-medium hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-all border border-yellow-200 dark:border-yellow-800 disabled:opacity-70 disabled:cursor-not-allowed"
+      title="Klik untuk kirim email verifikasi">
+      {isLoading ? (
+        <svg
+          className="animate-spin h-5 w-5"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      ) : (
+        <ExclamationCircleIcon className="w-5 h-5 group-hover:hidden" />
+      )}
+
+      {/* Ikon Pesawat muncul saat hover (efek visual) */}
+      <PaperAirplaneIcon className="w-4 h-4 hidden group-hover:block animate-pulse" />
+
+      <span>{isLoading ? "Mengirim..." : "Verifikasi Sekarang"}</span>
     </button>
   );
 }
