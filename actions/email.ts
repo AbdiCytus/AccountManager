@@ -70,7 +70,8 @@ export async function getEmails(query?: string) {
 
   const emails = await prisma.emailIdentity.findMany({
     where: whereCondition,
-    include: { // Ambil info email pemulih
+    include: {
+      // Ambil info email pemulih
       _count: { select: { linkedAccounts: true } },
     },
     orderBy: { createdAt: "desc" },
@@ -91,28 +92,6 @@ export async function getEmailPassword(id: string) {
   if (!data) return { success: false, password: "" };
 
   return { success: true, password: decrypt(data.encryptedPassword) };
-}
-
-// 4. HAPUS EMAIL
-export async function deleteEmail(id: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return { success: false, message: "Unauthorized" };
-
-  try {
-    await prisma.emailIdentity.delete({
-      where: { id, userId: session.user.id },
-    });
-
-    // Karena di Schema kita pakai onDelete: SetNull pada SavedAccount,
-    // maka akun-akun yang terhubung otomatis field emailId-nya jadi NULL.
-    // Tidak perlu update manual. Aman.
-
-    revalidatePath("/dashboard");
-    return { success: true, message: "Email berhasil dihapus" };
-  } catch (err) {
-    console.error("Gagal menghapus email", err);
-    return { success: false, message: "Gagal hapus email" };
-  }
 }
 
 // 5. AMBIL DETAIL EMAIL (+ AKUN TERHUBUNG)
@@ -159,5 +138,101 @@ export async function toggleEmailVerification(id: string) {
   } catch (error) {
     console.error("Gagal update status", error);
     return { success: false, message: "Gagal update status" };
+  }
+}
+
+export async function updateEmail(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return { success: false, message: "Unauthorized" };
+
+  const id = formData.get("id") as string;
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  const is2FA = formData.get("is2FA") === "on";
+  const phoneNumber = formData.get("phoneNumber") as string;
+  const recoveryEmailId = formData.get("recoveryEmailId") as string;
+
+  // Validasi dasar
+  if (!email) return { success: false, message: "Email wajib diisi" };
+
+  // Logic Password (hanya update jika diisi)
+  let passwordUpdate = {};
+  if (password && password.trim() !== "") {
+    passwordUpdate = { encryptedPassword: encrypt(password) };
+  }
+
+  interface twoFactorUpdateProps {
+    is2FAEnabled: boolean;
+    phoneNumber?: string | null;
+    recoveryEmailId?: string | null;
+  }
+
+  // Logic 2FA
+  let twoFactorUpdate: twoFactorUpdateProps = { is2FAEnabled: is2FA };
+  if (is2FA) {
+    if (!phoneNumber)
+      return { success: false, message: "No HP wajib untuk 2FA" };
+    if (!recoveryEmailId)
+      return { success: false, message: "Email Pemulih wajib untuk 2FA" };
+    twoFactorUpdate = {
+      is2FAEnabled: true,
+      phoneNumber,
+      recoveryEmailId,
+    };
+  } else {
+    // Reset jika 2FA dimatikan
+    twoFactorUpdate = {
+      is2FAEnabled: false,
+      phoneNumber: null,
+      recoveryEmailId: null,
+    };
+  }
+
+  try {
+    await prisma.emailIdentity.update({
+      where: { id, userId: session.user.id },
+      data: {
+        name,
+        email,
+        ...passwordUpdate,
+        ...twoFactorUpdate,
+      },
+    });
+
+    revalidatePath(`/dashboard/email/${id}`);
+    revalidatePath("/dashboard");
+    return { success: true, message: "Email berhasil diperbarui" };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Gagal update email" };
+  }
+}
+
+// 8. HAPUS EMAIL (UNLINK CHILDREN)
+export async function deleteEmail(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return { success: false, message: "Unauthorized" };
+
+  try {
+    await prisma.savedAccount.updateMany({
+      where: { emailId: id, userId: session.user.id },
+      data: { emailId: null },
+    });
+
+    // Baru hapus emailnya
+    await prisma.emailIdentity.delete({
+      where: { id, userId: session.user.id },
+    });
+
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      message: "Email dihapus. Akun terkait telah diputuskan.",
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Gagal menghapus email" };
   }
 }

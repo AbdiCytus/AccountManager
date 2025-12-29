@@ -3,9 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { getEmailById } from "@/actions/email";
+import { getEmails } from "@/actions/email";
+
 import Link from "next/link";
 import AccountCard from "@/components/AccountCard";
-import EmailVerificationButton from "@/components/EmailVerificationButton"; // Kita buat ini nanti
+import EmailVerificationButton from "@/components/EmailVerificationButton";
+import EditEmailModal from "@/components/EditEmailModal";
+import DeleteEmailButton from "@/components/DeleteEmailButton";
+
 import {
   ArrowLeftIcon,
   EnvelopeIcon,
@@ -22,6 +27,8 @@ export default async function EmailDetailPage(props: Props) {
 
   const emailData = await getEmailById(params.id);
   if (!emailData) notFound();
+
+  const allEmails = await getEmails();
 
   return (
     <div className="p-4 sm:p-8 min-h-screen bg-gray-50 dark:bg-black">
@@ -53,11 +60,20 @@ export default async function EmailDetailPage(props: Props) {
                 </div>
               </div>
 
-              {/* Tombol Verifikasi (Client Component) */}
-              <EmailVerificationButton
-                id={emailData.id}
-                isVerified={emailData.isVerified}
-              />
+              <div className="flex flex-col items-end gap-3">
+                {/* Tombol Verifikasi (Client Component) */}
+                <EmailVerificationButton
+                  id={emailData.id}
+                  isVerified={emailData.isVerified}
+                />
+                <div className="flex items-center gap-2">
+                  <EditEmailModal
+                    emailData={emailData}
+                    otherEmails={allEmails}
+                  />
+                  <DeleteEmailButton id={emailData.id} />
+                </div>
+              </div>
             </div>
 
             {/* INFO DETAIL GRID */}
