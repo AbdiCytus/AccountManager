@@ -26,7 +26,7 @@ export async function addAccount(formData: FormData): Promise<ActionResponse> {
   const groupId = formData.get("groupId") as string;
   const website = formData.get("website") as string;
   const description = formData.get("description") as string;
-  const icon = formData.get("icon") as string
+  const icon = formData.get("icon") as string;
   const categories = formData.getAll("category") as string[];
 
   // Validasi Dasar
@@ -116,17 +116,46 @@ export async function getAccountById(id: string) {
   });
 }
 
+// 4. UPDATE AKUN (REVISI TOTAL)
 export async function updateAccount(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { success: false, message: "Unauthorized" };
 
   const id = formData.get("id") as string;
+
+  // Ambil Data Form
   const platform = formData.get("platform") as string;
   const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
+  const noPassword = formData.get("noPassword") === "on";
+
+  const emailId = formData.get("emailId") as string;
+  const noEmail = formData.get("noEmail") === "on";
+
+  const groupId = formData.get("groupId") as string;
+  const website = formData.get("website") as string;
+  const description = formData.get("description") as string;
+  const icon = formData.get("icon") as string;
   const categories = formData.getAll("category") as string[];
 
-  // Logic update yang lain bisa disusul saat kita buat UI Editnya
-  // ...
+  if (!platform || !username) {
+    return { success: false, message: "Platform & Username wajib" };
+  }
+
+  let passwordUpdate: { encryptedPassword?: string | null } = {};
+  if (noPassword) {
+    passwordUpdate = { encryptedPassword: null };
+  } else if (password && password.trim() !== "") {
+    passwordUpdate = { encryptedPassword: encrypt(password) };
+  }
+
+  // LOGIKA EMAIL:
+  let emailUpdate: { emailId?: string | null } = {};
+  if (noEmail) {
+    emailUpdate = { emailId: null };
+  } else if (emailId) {
+    emailUpdate = { emailId: emailId };
+  }
 
   try {
     await prisma.savedAccount.update({
@@ -135,14 +164,23 @@ export async function updateAccount(formData: FormData) {
         platformName: platform,
         username,
         categories,
-        // ... field lain
+        groupId: groupId || null,
+        website: website || null,
+        description: description || null,
+        icon: icon || undefined, // undefined artinya jangan ubah jika tidak dikirim
+        ...passwordUpdate,
+        ...emailUpdate,
       },
     });
+
+    // Revalidate halaman detail dan dashboard
+    revalidatePath(`/dashboard/account/${id}`);
     revalidatePath("/dashboard");
-    return { success: true, message: "Akun diupdate" };
+
+    return { success: true, message: "Perubahan disimpan!" };
   } catch (error) {
-    console.error("Gagal update akun:", error);
-    return { success: false, message: "Gagal update" };
+    console.error(error);
+    return { success: false, message: "Gagal update akun" };
   }
 }
 

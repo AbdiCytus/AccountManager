@@ -4,11 +4,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { getAccountById } from "@/actions/account";
+import { getEmails } from "@/actions/email";
+import { getGroups } from "@/actions/group";
 
 import Link from "next/link";
 import Image from "next/image";
+
 import PasswordViewer from "@/components/PasswordViewer";
 import DeleteAccountButton from "@/components/DeleteAccountButton";
+import EditAccountModal from "@/components/EditAccountModal";
 
 import {
   ArrowLeftIcon,
@@ -18,7 +22,6 @@ import {
   DocumentTextIcon,
   FolderIcon,
   EnvelopeIcon,
-  PencilIcon,
 } from "@heroicons/react/24/outline";
 
 type Props = { params: Promise<{ id: string }> };
@@ -45,6 +48,8 @@ export default async function AccountDetailPage(props: Props) {
     ? `Kembali ke ${account.group.name}`
     : "Kembali ke Dashboard";
 
+  const [emails, groups] = await Promise.all([getEmails(), getGroups()]);
+
   return (
     <div className="p-4 sm:p-8 min-h-screen bg-gray-50 dark:bg-black">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -63,11 +68,12 @@ export default async function AccountDetailPage(props: Props) {
               <Image
                 src={account.icon}
                 alt={account.platformName}
-                width={200} height={200}
+                width={200}
+                height={200}
                 className="w-full h-full object-cover rounded-2xl"
               />
             ) : (
-              <span className="text-4xl text-gray-300 dark:text-gray-500">
+              <span className="text-4xl text-gray-200">
                 {account.platformName.charAt(0).toUpperCase()}
               </span>
             )}
@@ -90,11 +96,11 @@ export default async function AccountDetailPage(props: Props) {
 
           {/* TOMBOL AKSI (Edit & Hapus) */}
           <div className="flex items-center gap-2">
-            {/* Tombol Edit (Nanti difungsikan di Fase 3) */}
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-              <PencilIcon className="w-5 h-5" />
-              <span>Edit</span>
-            </button>
+            <EditAccountModal
+              account={account}
+              emails={emails}
+              groups={groups}
+            />
 
             <DeleteAccountButton
               id={account.id}
@@ -139,7 +145,7 @@ export default async function AccountDetailPage(props: Props) {
                 <PasswordViewer accountId={account.id} />
               ) : (
                 <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg text-gray-500 text-sm italic border border-gray-100 dark:border-gray-800">
-                  This Account not Have a Password
+                  {"This account doesn't have a password"}
                 </div>
               )}
             </div>

@@ -94,7 +94,7 @@ export default function AccountCard({
         ) : (
           <div className="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800 text-center">
             <span className="text-xs text-gray-400 italic">
-              This Account not Have a Password
+              {"This account doesn't have a password"}
             </span>
           </div>
         )}
