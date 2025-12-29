@@ -11,12 +11,14 @@ import EmailVerificationButton from "@/components/EmailVerificationButton";
 import EditEmailModal from "@/components/EditEmailModal";
 import DeleteEmailButton from "@/components/DeleteEmailButton";
 import ActionMenu from "@/components/ActionMenu";
+import PasswordViewer from "@/components/PasswordViewer";
 
 import {
   ArrowLeftIcon,
   EnvelopeIcon,
   PhoneIcon,
   ShieldCheckIcon,
+  KeyIcon,
 } from "@heroicons/react/24/outline";
 
 type Props = { params: Promise<{ id: string }> };
@@ -67,7 +69,7 @@ export default async function EmailDetailPage(props: Props) {
                   emailId={emailData.id}
                   isVerified={emailData.isVerified}
                 />
-                
+
                 <div>
                   <ActionMenu>
                     <EditEmailModal
@@ -126,6 +128,17 @@ export default async function EmailDetailPage(props: Props) {
                     {emailData.recoveryEmail?.email || "-"}
                   </p>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 sm:col-span-2 lg:col-span-3 xl:col-span-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <KeyIcon className="w-6 h-6 text-rose-500" />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">
+                    Password
+                  </p>
+                </div>
+                {/* Panggil komponen PasswordViewer dengan emailId */}
+                <PasswordViewer emailId={emailData.id} />
               </div>
             </div>
           </div>
