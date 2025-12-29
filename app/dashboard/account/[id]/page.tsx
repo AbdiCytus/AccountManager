@@ -13,6 +13,7 @@ import Image from "next/image";
 import PasswordViewer from "@/components/PasswordViewer";
 import DeleteAccountButton from "@/components/DeleteAccountButton";
 import EditAccountModal from "@/components/EditAccountModal";
+import ActionMenu from "@/components/ActionMenu";
 
 import {
   ArrowLeftIcon,
@@ -95,18 +96,21 @@ export default async function AccountDetailPage(props: Props) {
           </div>
 
           {/* TOMBOL AKSI (Edit & Hapus) */}
-          <div className="flex items-center gap-2">
-            <EditAccountModal
-              account={account}
-              emails={emails}
-              groups={groups}
-            />
-
-            <DeleteAccountButton
-              id={account.id}
-              accountName={account.platformName}
-              redirectTo={backHref}
-            />
+          <div className="flex items-center">
+            <ActionMenu>
+              <EditAccountModal
+                account={account}
+                emails={emails}
+                groups={groups}
+                isIcon={true}
+              />
+              <DeleteAccountButton
+                id={account.id}
+                accountName={account.platformName}
+                redirectTo={backHref}
+                isIcon={true}
+              />
+            </ActionMenu>
           </div>
         </div>
 

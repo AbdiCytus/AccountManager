@@ -23,7 +23,7 @@ export default async function GroupDetailPage(props: Props) {
   if (!groupData) notFound();
 
   return (
-    <div className="p-4 sm:p-8 min-h-screen">
+    <div className="p-4 sm:p-8 min-h-screen bg-gray-50 dark:bg-black">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* 1. NAVIGASI KEMBALI */}
         <div>

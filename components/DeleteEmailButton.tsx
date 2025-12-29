@@ -9,7 +9,15 @@ import {
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 
-export default function DeleteEmailButton({ id }: { id: string }) {
+interface DeleteEmailProps {
+  id: string;
+  isIcon: boolean;
+}
+
+export default function DeleteEmailButton({
+  id,
+  isIcon = false,
+}: DeleteEmailProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,9 +42,20 @@ export default function DeleteEmailButton({ id }: { id: string }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-        <TrashIcon className="w-5 h-5" />
-        <span>Hapus</span>
+        className={
+          isIcon
+            ? "p-2 text-red-500 hover:text-red-700 transition-colors rounded-full hover:bg-red-50 dark:hover:bg-red-900/30"
+            : "flex items-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+        }
+        title="Hapus Email">
+        {isIcon ? (
+          <TrashIcon className="w-5 h-5" />
+        ) : (
+          <>
+            <TrashIcon className="w-4 h-4" />
+            <span>Hapus</span>
+          </>
+        )}
       </button>
 
       {/* Modal Konfirmasi */}

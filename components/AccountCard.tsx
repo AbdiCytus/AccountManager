@@ -29,7 +29,7 @@ export default function AccountCard({
     // SELURUH KARTU ADALAH LINK KE DETAIL
     <Link
       href={`/dashboard/account/${id}`}
-      className="block bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all relative group/card hover:border-blue-300 dark:hover:border-blue-700">
+      className="block bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all relative group/card hover:-translate-y-1 hover:border-blue-300 dark:hover:border-blue-700">
       {/* Badge Kategori */}
       <div className="flex items-start justify-between mb-3 gap-2">
         {/* Render Semua Kategori */}

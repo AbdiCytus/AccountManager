@@ -10,6 +10,7 @@ import AccountCard from "@/components/AccountCard";
 import EmailVerificationButton from "@/components/EmailVerificationButton";
 import EditEmailModal from "@/components/EditEmailModal";
 import DeleteEmailButton from "@/components/DeleteEmailButton";
+import ActionMenu from "@/components/ActionMenu";
 
 import {
   ArrowLeftIcon,
@@ -60,18 +61,22 @@ export default async function EmailDetailPage(props: Props) {
                 </div>
               </div>
 
-              <div className="flex flex-col items-end gap-3">
+              <div className="flex items-center gap-3">
                 {/* Tombol Verifikasi (Client Component) */}
                 <EmailVerificationButton
                   emailId={emailData.id}
                   isVerified={emailData.isVerified}
                 />
-                <div className="flex items-center gap-2">
-                  <EditEmailModal
-                    emailData={emailData}
-                    otherEmails={allEmails}
-                  />
-                  <DeleteEmailButton id={emailData.id} />
+                
+                <div>
+                  <ActionMenu>
+                    <EditEmailModal
+                      emailData={emailData}
+                      otherEmails={allEmails}
+                      isIcon={true}
+                    />
+                    <DeleteEmailButton id={emailData.id} isIcon={true} />
+                  </ActionMenu>
                 </div>
               </div>
             </div>

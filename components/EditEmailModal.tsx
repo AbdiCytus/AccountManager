@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { updateEmail } from "@/actions/email";
 import { EmailIdentity } from "@/app/generated/prisma/client"; // Import tipe data asli dari Prisma
 import {
-  PencilIcon,
+  PencilSquareIcon,
   XMarkIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
@@ -15,9 +15,14 @@ import Portal from "./Portal";
 type Props = {
   emailData: EmailIdentity;
   otherEmails: { id: string; email: string }[];
+  isIcon: boolean;
 };
 
-export default function EditEmailModal({ emailData, otherEmails }: Props) {
+export default function EditEmailModal({
+  emailData,
+  otherEmails,
+  isIcon = false,
+}: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,9 +95,13 @@ export default function EditEmailModal({ emailData, otherEmails }: Props) {
       {/* TRIGGER BUTTON */}
       <button
         onClick={handleOpen}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-        <PencilIcon className="w-5 h-5" />
-        <span>Edit</span>
+        className={
+          isIcon
+            ? "p-2 text-blue-600 hover:text-blue-800 transition-all rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30"
+            : "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+        }
+        title="Edit Email">
+        {isIcon && <PencilSquareIcon className="w-5 h-5" />}
       </button>
 
       {/* OVERLAY MODAL */}
