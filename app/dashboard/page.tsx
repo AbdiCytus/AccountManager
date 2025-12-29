@@ -1,66 +1,63 @@
 // app/dashboard/page.tsx
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getAccounts } from "@/actions/account";
-import AddAccountModal from "@/components/AddAccountModal";
-import AccountCard from "@/components/AccountCard";
-import SearchInput from "@/components/SearchInput";
+import { getEmails } from "@/actions/email";
+import { getGroups } from "@/actions/group";
 
-type Props = { searchParams: Promise<{ q?: string }> };
+import AddDataModal from "@/components/AddDataModal";
+import SearchInput from "@/components/SearchInput";
+import DashboardClient from "@/components/DashboardClient";
+
+type Props = { searchParams: Promise<{ q?: string; tab?: string }> };
 
 export default async function DashboardPage(props: Props) {
   const searchParams = await props.searchParams;
   const query = searchParams?.q || "";
-
   const session = await getServerSession(authOptions);
+
   if (!session) redirect("/login");
 
-  const accounts = await getAccounts(query);
+  // Fetch semua data secara paralel agar cepat
+  const [accounts, emails, groups] = await Promise.all([
+    getAccounts(query),
+    getEmails(query),
+    getGroups(query),
+  ]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
-        {/* HEADER: Judul & Tombol Tambah */}
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+    <div className="p-4 sm:p-8 min-h-[calc(100vh-140px)] bg-gray-50 dark:bg-black">
+      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4 transition-colors">
           <div className="w-full md:w-auto">
-            <h1 className="text-2xl font-bold text-gray-800">Brankas Akun</h1>
-            <p className="text-gray-500 text-sm">Halo, {session.user?.name}</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
+              Brankas Akun
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              Halo, <span className="font-medium">{session.user?.name}</span>
+            </p>
           </div>
 
-          <div className="flex w-full md:w-auto gap-3 items-center">
-            <SearchInput />
-            <AddAccountModal />
+          <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3 sm:items-center">
+            <div className="w-full sm:w-64 lg:w-80">
+              <SearchInput />
+            </div>
+            <div className="w-full sm:w-auto flex justify-end">
+              {/* Gunakan Modal Baru & Lempar Data */}
+              <AddDataModal existingEmails={emails} existingGroups={groups} />
+            </div>
           </div>
         </div>
-
-        {/* LIST AKUN (GRID) */}
-        {accounts.length === 0 ? (
-          // State Kosong
-          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-            <p className="text-gray-500 text-lg">
-              {query
-                ? `Tidak ditemukan akun dengan nama "${query}"`
-                : "Belum ada akun yang disimpan."}
-            </p>
-            <p className="text-sm text-gray-400">
-              {`Klik tombol "Tambah Akun" untuk mulai.`}
-            </p>
-          </div>
-        ) : (
-          // State Ada Data
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {accounts.map((account) => (
-              <AccountCard
-                key={account.id}
-                id={account.id}
-                platformName={account.platformName}
-                username={account.username}
-                category={account.category}
-              />
-            ))}
-          </div>
-        )}
+        {/* AREA CLIENT (Toggle & Cards) */}
+        <DashboardClient
+          accounts={accounts}
+          groups={groups}
+          emails={emails}
+          query={query}
+        />
       </div>
     </div>
   );

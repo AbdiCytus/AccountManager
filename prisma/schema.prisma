@@ -7,33 +7,132 @@ datasource db {
   provider = "postgresql"
 }
 
+// Model User (Pemilik Aplikasi)
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
+  
+  // Relasi ke data-data milik user
+  accounts      Account[]      // Akun OAuth (Google login sistem)
   sessions      Session[]
-  savedAccounts SavedAccount[]
+  
+  // Data Aplikasi Utama
+  savedAccounts SavedAccount[] // Daftar Akun Platform
+  emailIdentities EmailIdentity[] // Daftar Email
+  accountGroups AccountGroup[] // Daftar Grup
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
+// ---------------------------------------------------------
+// 1. MODEL EMAIL (Email Identity)
+// ---------------------------------------------------------
+model EmailIdentity {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name          String?  // Nama Pengguna (Opsional)
+  email         String   // Alamat Email (Wajib)
+  encryptedPassword String // Password Email (Wajib)
+  
+  // Fitur 2FA
+  is2FAEnabled  Boolean  @default(false)
+  phoneNumber   String?  // Wajib jika 2FA aktif
+  
+  // Self-Relation: Email Pemulih (Diambil dari email lain)
+  recoveryEmailId String?
+  recoveryEmail   EmailIdentity?  @relation("RecoveryRelation", fields: [recoveryEmailId], references: [id])
+  recoveringFor   EmailIdentity[] @relation("RecoveryRelation")
+
+  // Fitur Verifikasi
+  tokenExpiresAt       DateTime?
+  lastVerificationSent DateTime? 
+  verificationAttempts Int       @default(0) 
+  isVerified           Boolean   @default(false) 
+  verificationToken    String? 
+
+  // Relasi ke Akun Platform (The Children)
+  linkedAccounts SavedAccount[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, email]) // Satu user tidak boleh punya email kembar
+}
+
+// ---------------------------------------------------------
+// 2. MODEL GROUP (Buku)
+// ---------------------------------------------------------
+model AccountGroup {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name          String   // Judul Group
+  
+  // Relasi: Group isinya akun-akun
+  accounts      SavedAccount[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ---------------------------------------------------------
+// 3. MODEL AKUN PLATFORM (SavedAccount)
+// ---------------------------------------------------------
+model SavedAccount {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  platformName  String   // Nama Platform (Wajib)
+  username      String   // Username (Wajib)
+  encryptedPassword String? // Bisa null jika "No Password" dicentang
+  
+  // Kategori sekarang Array String agar bisa pilih lebih dari satu
+  // Contoh: ["Social", "Work"]
+  categories    String[] 
+
+  icon          String?  // URL/Base64 Gambar Rasio 1:1
+  website       String?  // Link Web
+  description   String?  // Keterangan
+  
+  // Relasi ke Email (Opsional / No Email)
+  // Jika EmailIdentity dihapus, field ini jadi null (SetNull)
+  emailId       String?
+  emailIdentity EmailIdentity? @relation(fields: [emailId], references: [id], onDelete: SetNull)
+
+  // Relasi ke Group (Opsional)
+  groupId       String?
+  group         AccountGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ---------------------------------------------------------
+// MODEL BAWAAN NEXT-AUTH (JANGAN DIUBAH)
+// ---------------------------------------------------------
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -52,21 +151,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model SavedAccount {
-  id                String   @id @default(cuid())
-  
-  platformName      String   // Misal: "Facebook", "Genshin Impact"
-  username          String   // Misal: "traveler123"
-  encryptedPassword String   // 🔒 Password yang sudah diacak (BUKAN TEXT BIASA)
-  
-  category          String   @default("Other") // "Game", "Social", "Work"
-  websiteUrl        String?  // Opsional, buat simpan link login
-  notes             String?  // Catatan tambahan
-
-  userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
 }
