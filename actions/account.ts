@@ -104,6 +104,19 @@ export async function getAccounts(query?: string) {
   });
 }
 
+export async function getAccountById(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return null;
+
+  return await prisma.savedAccount.findUnique({
+    where: { id, userId: session.user.id },
+    include: {
+      emailIdentity: { select: { email: true, name: true } }, // Ambil info email terhubung
+      group: { select: { id: true, name: true } }, // Ambil info grup
+    },
+  });
+}
+
 export async function updateAccount(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { success: false, message: "Unauthorized" };

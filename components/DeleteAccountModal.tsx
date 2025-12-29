@@ -13,16 +13,15 @@ import {
 type DeleteProps = {
   isOpen: boolean;
   onClose: () => void;
-  account: {
-    id: string;
-    platformName: string;
-  };
+  account: { id: string; platformName: string };
+  redirectTo?: string;
 };
 
 export default function DeleteAccountModal({
   isOpen,
   onClose,
   account,
+  redirectTo,
 }: DeleteProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -36,11 +35,11 @@ export default function DeleteAccountModal({
 
     if (result.success) {
       toast.success("Akun berhasil dihapus!");
-      router.refresh();
       onClose();
-    } else {
-      toast.error("Gagal menghapus akun.");
-    }
+      if (redirectTo) router.push(redirectTo);
+      else router.refresh();
+      router.refresh();
+    } else toast.error("Gagal menghapus akun.");
   }
 
   return (

@@ -74,7 +74,9 @@ export default async function GroupDetailPage(props: Props) {
                   id={acc.id}
                   platformName={acc.platformName}
                   username={acc.username}
-                  category={acc.categories[0] || "Other"}
+                  categories={acc.categories}
+                  email={acc.emailIdentity?.email} 
+                  hasPassword={!!acc.encryptedPassword}
                 />
               ))}
             </div>

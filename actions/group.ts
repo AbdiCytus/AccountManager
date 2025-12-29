@@ -76,6 +76,9 @@ export async function getGroupById(id: string) {
     include: {
       accounts: {
         orderBy: { createdAt: "desc" },
+        include: {
+          emailIdentity: { select: { email: true } },
+        },
       },
     },
   });

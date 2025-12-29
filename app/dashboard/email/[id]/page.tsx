@@ -13,9 +13,7 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
+type Props = { params: Promise<{ id: string }> };
 
 export default async function EmailDetailPage(props: Props) {
   const params = await props.params;
@@ -31,7 +29,7 @@ export default async function EmailDetailPage(props: Props) {
         {/* HEADER & NAVIGASI */}
         <div>
           <Link
-            href="/dashboard"
+            href="/dashboard?tab=emails"
             className="inline-flex items-center text-sm text-gray-500 hover:text-blue-600 mb-4 transition-colors">
             <ArrowLeftIcon className="w-4 h-4 mr-1" /> Kembali ke Dashboard
           </Link>
@@ -135,7 +133,7 @@ export default async function EmailDetailPage(props: Props) {
                   id={acc.id}
                   platformName={acc.platformName}
                   username={acc.username}
-                  category={acc.categories[0] || "Other"} // Ambil kategori pertama
+                  categories={acc.categories} // Ambil kategori pertama
                 />
               ))}
             </div>

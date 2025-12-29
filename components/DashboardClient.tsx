@@ -99,7 +99,7 @@ export default function DashboardClient({
             </div>
           )}
 
-          {/* Section Akun (Hanya yang tidak masuk grup) */}
+          {/* Section Akun */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {accounts.length === 0 && groups.length === 0 ? (
               <div className="col-span-full text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
@@ -116,7 +116,9 @@ export default function DashboardClient({
                   id={acc.id}
                   platformName={acc.platformName}
                   username={acc.username}
-                  category={acc.categories?.[0] || "Other"}
+                  categories={acc.categories}
+                  email={acc.emailIdentity?.email}
+                  hasPassword={!!acc.encryptedPassword}
                 />
               ))
             )}

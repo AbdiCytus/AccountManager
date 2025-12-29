@@ -35,31 +35,39 @@ export default function AddDataModal({
   const CATEGORIES = ["Social", "Game", "Work", "Finance", "Other"];
 
   // --- HANDLER SUBMIT ---
-  async function handleSubmit(formData: FormData) {
+  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    // 1. Cegah reload browser & default form submission
+    event.preventDefault();
+
+    // 2. Set Loading SEGERA (React akan memprioritaskan ini karena event handler manual)
     setIsLoading(true);
+
+    // 3. Ambil data dari form secara manual
+    const formData = new FormData(event.currentTarget);
+
+    // 4. Jeda Buatan (Agar user melihat status 'Menyimpan...')
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     let result;
 
     try {
-      if (activeTab === "group") {
-        result = await addGroup(formData);
-      } else if (activeTab === "email") {
-        result = await addEmail(formData);
-      } else {
-        result = await addAccount(formData);
-      }
+      if (activeTab === "group") result = await addGroup(formData);
+      else if (activeTab === "email") result = await addEmail(formData);
+      else result = await addAccount(formData);
 
       if (result.success) {
         toast.success(result.message);
         setIsOpen(false);
         resetFormState();
         router.refresh();
+        // Jangan set isLoading(false) agar modal tertutup mulus
       } else {
         toast.error(result.message);
+        setIsLoading(false); // Kembalikan tombol jika gagal
       }
     } catch (error) {
       console.error(error);
       toast.error("Terjadi kesalahan sistem");
-    } finally {
       setIsLoading(false);
     }
   }
@@ -68,7 +76,6 @@ export default function AddDataModal({
     setIs2FA(false);
     setNoEmail(false);
     setNoPassword(false);
-    // Reset tab ke default jika perlu
     setActiveTab("account");
   }
 
@@ -122,7 +129,7 @@ export default function AddDataModal({
 
             {/* Form Body (Scrollable) */}
             <form
-              action={handleSubmit}
+              onSubmit={handleFormSubmit}
               className="p-6 space-y-5 overflow-y-auto">
               {/* --- FORM 1: TAMBAH GROUP --- */}
               {activeTab === "group" && (
