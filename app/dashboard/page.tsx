@@ -34,10 +34,10 @@ export default async function DashboardPage(props: Props) {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4 transition-colors">
           <div className="w-full md:w-auto">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
-              Brankas Akun
+              Manage Accounts
             </h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              Halo, <span className="font-medium">{session.user?.name}</span>
+              Hello, <span className="font-medium">{session.user?.name}</span>
             </p>
           </div>
 

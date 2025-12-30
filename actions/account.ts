@@ -90,7 +90,7 @@ export async function getAccounts(query?: string) {
       { platformName: { contains: query, mode: "insensitive" } },
       { username: { contains: query, mode: "insensitive" } },
     ];
-  } else whereCondition.groupId = null;
+  }
 
   return await prisma.savedAccount.findMany({
     where: whereCondition,

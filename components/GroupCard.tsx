@@ -41,7 +41,7 @@ export default function GroupCard({ id, name, count }: GroupProps) {
                 <FolderIcon className="w-8 h-8" />
               </div>
               <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold px-2 py-1 rounded-full">
-                {count} Akun
+                {count} Items
               </span>
             </div>
 
