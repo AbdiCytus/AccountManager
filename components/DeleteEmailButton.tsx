@@ -8,6 +8,7 @@ import {
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
+import Portal from "./Portal";
 
 interface DeleteEmailProps {
   id: string;
@@ -60,37 +61,39 @@ export default function DeleteEmailButton({
 
       {/* Modal Konfirmasi */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 dark:text-red-400">
-              <ExclamationTriangleIcon className="w-7 h-7" />
-            </div>
+        <Portal>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 dark:text-red-400">
+                <ExclamationTriangleIcon className="w-7 h-7" />
+              </div>
 
-            <h3 className="text-lg font-bold text-center text-gray-900 dark:text-white mb-2">
-              Hapus Email Ini?
-            </h3>
-            <p className="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
-              {
-                'Tindakan ini permanen. Semua akun yang menggunakan email ini akan diputuskan hubungannya (menjadi "No Email").'
-              }
-            </p>
+              <h3 className="text-lg font-bold text-center text-gray-900 dark:text-white mb-2">
+                Hapus Email Ini?
+              </h3>
+              <p className="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
+                {
+                  'Tindakan ini permanen. Semua akun yang menggunakan email ini akan diputuskan hubungannya (menjadi "No Email").'
+                }
+              </p>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setIsOpen(false)}
-                disabled={isLoading}
-                className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition-colors">
-                Batal
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isLoading}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50">
-                {isLoading ? "Menghapus..." : "Ya, Hapus"}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition-colors">
+                  Batal
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50">
+                  {isLoading ? "Menghapus..." : "Ya, Hapus"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
     </>
   );
