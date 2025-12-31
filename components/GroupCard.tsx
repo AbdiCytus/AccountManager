@@ -68,7 +68,7 @@ export default function GroupCard({
                   isSelectMode
                     ? isSelected
                       ? "border-blue-500 ring-2 ring-blue-500/20"
-                      : "border-blue-100 dark:border-gray-700 opacity-80"
+                      : "border-blue-100 dark:border-gray-700 opacity-50 hover:opacity-100"
                     : isOver
                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/50 scale-105"
                     : "border-blue-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700"

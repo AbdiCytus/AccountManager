@@ -1,7 +1,7 @@
 // components/DashboardClient.tsx
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   UserIcon,
@@ -16,7 +16,7 @@ import {
   TrashIcon,
   CursorArrowRaysIcon,
   ArrowUpTrayIcon,
-  ArchiveBoxArrowDownIcon, // Icon Baru
+  ArchiveBoxArrowDownIcon,
 } from "@heroicons/react/24/solid";
 import AccountCard from "./AccountCard";
 import GroupCard from "./GroupCard";
@@ -88,7 +88,7 @@ const CATEGORIES = ["Social", "Game", "Work", "Finance", "Other"];
 
 // --- 2. HELPER COMPONENTS ---
 
-// -- MODAL PILIH GROUP (BARU) --
+// -- MODAL PILIH GROUP --
 interface SelectGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -108,7 +108,7 @@ const SelectGroupModal = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
         <div
           className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-in fade-in"
           onClick={onClose}></div>
@@ -200,11 +200,11 @@ interface SectionWithSelectProps {
   selectMode: "none" | "accounts" | "groups";
   selectedCount: number;
   canBulkEject?: boolean;
-  canBulkMove?: boolean; // Prop baru
+  canBulkMove?: boolean;
   onSelectAll: () => void;
   onDelete: () => void;
   onEject?: () => void;
-  onMove?: () => void; // Prop baru
+  onMove?: () => void;
   onCancel: () => void;
   onEnterSelect: () => void;
 }
@@ -244,7 +244,7 @@ const SectionWithSelect = ({
           <>
             {isThisMode ? (
               <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300 ml-2">
-                <span className="text-xs font-medium text-blue-600 dark:text-blue-400 min-w-[60px] text-right">
+                <span className="text-xs font-medium text-blue-600 dark:text-blue-400 min-w-15 text-right">
                   {selectedCount} terpilih
                 </span>
 
@@ -254,7 +254,7 @@ const SectionWithSelect = ({
                   Select All
                 </button>
 
-                {/* TOMBOL MOVE TO GROUP (Hanya muncul jika semua akun belum punya grup) */}
+                {/* TOMBOL MOVE TO GROUP */}
                 {canBulkMove && onMove && (
                   <button
                     onClick={onMove}
@@ -264,7 +264,7 @@ const SectionWithSelect = ({
                   </button>
                 )}
 
-                {/* TOMBOL EJECT GROUP (Hanya muncul jika semua akun dalam grup) */}
+                {/* TOMBOL EJECT GROUP */}
                 {canBulkEject && onEject && (
                   <button
                     onClick={onEject}
@@ -342,16 +342,10 @@ export default function DashboardClient({
     "delete"
   );
 
-  // State untuk Modal Pilih Group (Move)
+  // State Modal Group (Move)
   const [isGroupSelectModalOpen, setIsGroupSelectModalOpen] = useState(false);
 
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Reset selection on tab change
-  useEffect(() => {
-    setSelectMode("none");
-    setSelectedIds(new Set());
-  }, [activeTab]);
 
   // --- HANDLERS: FILTER & TAB ---
 
@@ -379,12 +373,13 @@ export default function DashboardClient({
     );
   };
 
-  // --- MEMOIZED FILTERING ---
+  // --- MEMOIZED FILTERING & SORTING (TYPE SAFE) ---
 
   const { filteredAccounts, filteredGroups } = useMemo(() => {
     let resAccounts = [...accounts];
     let resGroups = [...groups];
 
+    // 1. Filter Type
     if (filterType === "group") {
       resAccounts = [];
     } else if (filterType === "account") {
@@ -393,6 +388,7 @@ export default function DashboardClient({
       resAccounts = resAccounts.filter((acc) => !acc.groupId);
     }
 
+    // 2. Filter Attributes
     if (filterType !== "group") {
       if (filterType === "account") {
         if (filterGroupStatus === "inside") {
@@ -420,21 +416,31 @@ export default function DashboardClient({
       }
     }
 
-    const sortFn = (a: any, b: any, key: string) => {
-      if (sortBy === "az") return a[key].localeCompare(b[key]);
-      if (sortBy === "za") return b[key].localeCompare(a[key]);
-      return 0;
-    };
-
+    // 3. Sorting (Inline & Type Safe - FIX FOR ANY TYPE)
     if (resAccounts.length > 0) {
-      if (sortBy === "oldest") resAccounts.reverse();
-      else if (sortBy !== "newest")
-        resAccounts.sort((a, b) => sortFn(a, b, "platformName"));
+      if (sortBy === "oldest") {
+        resAccounts.reverse();
+      } else if (sortBy !== "newest") {
+        resAccounts.sort((a, b) => {
+          if (sortBy === "az")
+            return a.platformName.localeCompare(b.platformName);
+          if (sortBy === "za")
+            return b.platformName.localeCompare(a.platformName);
+          return 0;
+        });
+      }
     }
+
     if (resGroups.length > 0) {
-      if (sortBy === "oldest") resGroups.reverse();
-      else if (sortBy !== "newest")
-        resGroups.sort((a, b) => sortFn(a, b, "name"));
+      if (sortBy === "oldest") {
+        resGroups.reverse();
+      } else if (sortBy !== "newest") {
+        resGroups.sort((a, b) => {
+          if (sortBy === "az") return a.name.localeCompare(b.name);
+          if (sortBy === "za") return b.name.localeCompare(a.name);
+          return 0;
+        });
+      }
     }
 
     return { filteredAccounts: resAccounts, filteredGroups: resGroups };
@@ -454,7 +460,6 @@ export default function DashboardClient({
 
   // --- SELECTION LOGIC ---
 
-  // VALIDASI EJECT (Semua harus di dalam grup)
   const canBulkEject = useMemo(() => {
     if (selectMode !== "accounts" || selectedIds.size === 0) return false;
     const selectedAccounts = filteredAccounts.filter((acc) =>
@@ -466,13 +471,11 @@ export default function DashboardClient({
     );
   }, [selectMode, selectedIds, filteredAccounts]);
 
-  // VALIDASI MOVE (Semua harus di luar grup / Orphan)
   const canBulkMove = useMemo(() => {
     if (selectMode !== "accounts" || selectedIds.size === 0) return false;
     const selectedAccounts = filteredAccounts.filter((acc) =>
       selectedIds.has(acc.id)
     );
-    // Tombol hanya muncul jika selected > 0 DAN semua selected item TIDAK punya groupId (null)
     return (
       selectedAccounts.length > 0 &&
       selectedAccounts.every((acc) => acc.groupId === null)
@@ -549,16 +552,13 @@ export default function DashboardClient({
     }
   };
 
-  // Handler untuk Memindahkan Akun ke Grup (via Modal)
   const handleBulkMoveToGroup = async (targetGroupId: string) => {
     setIsProcessing(true);
     const ids = Array.from(selectedIds);
-
-    // Kita gunakan action yang sudah ada
     const result = await moveBulkAccountsToGroup(ids, targetGroupId);
 
     setIsProcessing(false);
-    setIsGroupSelectModalOpen(false); // Tutup modal group
+    setIsGroupSelectModalOpen(false);
 
     if (result.success) {
       toast.success(result.message);
@@ -577,6 +577,7 @@ export default function DashboardClient({
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over) return;
+
     const activeData = active.data.current as DndData | undefined;
     const overData = over.data.current as DndData | undefined;
 
@@ -590,6 +591,7 @@ export default function DashboardClient({
         selectMode === "accounts" && selectedIds.has(activeId);
       const idsToMove = isMultiDrag ? Array.from(selectedIds) : [activeId];
       const count = idsToMove.length;
+
       const toastId = toast.loading(
         `Memindahkan ${
           count > 1 ? `${count} akun` : activeData.platformName
@@ -621,7 +623,7 @@ export default function DashboardClient({
           <div className="flex gap-2 w-full sm:w-auto relative">
             {activeTab === "accounts" ? (
               <>
-                {/* FILTER DROPDOWN */}
+                {/* FILTER */}
                 <div className="relative">
                   <button
                     onClick={() =>
@@ -823,7 +825,7 @@ export default function DashboardClient({
                   )}
                 </div>
 
-                {/* SORT DROPDOWN */}
+                {/* SORT */}
                 <div className="relative">
                   <button
                     onClick={() =>
@@ -909,9 +911,9 @@ export default function DashboardClient({
           </div>
         </div>
 
+        {/* CONTENT */}
         {activeTab === "accounts" ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* SECTION GROUP */}
             {filteredGroups.length > 0 && (
               <section className="space-y-3">
                 <SectionWithSelect
@@ -942,7 +944,6 @@ export default function DashboardClient({
               </section>
             )}
 
-            {/* SECTION AKUN */}
             {filteredAccounts.length > 0 && (
               <section className="space-y-3">
                 <SectionWithSelect
@@ -953,11 +954,11 @@ export default function DashboardClient({
                   selectMode={selectMode}
                   selectedCount={selectedIds.size}
                   canBulkEject={canBulkEject}
-                  canBulkMove={canBulkMove} // Pass validasi Move
+                  canBulkMove={canBulkMove}
                   onSelectAll={() => handleSelectAll("accounts")}
                   onDelete={handleDeleteTrigger}
                   onEject={handleEjectTrigger}
-                  onMove={handleMoveTrigger} // Handler Move
+                  onMove={handleMoveTrigger}
                   onCancel={exitSelectMode}
                   onEnterSelect={() => enterSelectMode("accounts")}
                 />
@@ -983,7 +984,6 @@ export default function DashboardClient({
               </section>
             )}
 
-            {/* EMPTY STATE */}
             {isDataEmpty && (
               <div className="col-span-full text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
                 <div className="flex flex-col items-center gap-2">
@@ -1055,7 +1055,6 @@ export default function DashboardClient({
         isLoading={isProcessing}
       />
 
-      {/* MODAL PILIH GROUP */}
       <SelectGroupModal
         isOpen={isGroupSelectModalOpen}
         onClose={() => setIsGroupSelectModalOpen(false)}
