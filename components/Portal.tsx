@@ -15,10 +15,7 @@ export default function Portal({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Jika belum mounted, jangan render apa-apa
   if (!mounted) return null;
-
-  // Pengecekan safety
   if (typeof document === "undefined") return null;
 
   return createPortal(children, document.body);
