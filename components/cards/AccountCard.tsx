@@ -11,7 +11,7 @@ import { CheckCircleIcon as SolidCheckIcon } from "@heroicons/react/24/solid";
 import { removeAccountFromGroup } from "@/actions/account";
 import Image from "next/image";
 import Link from "next/link";
-import PasswordViewer from "./PasswordViewer";
+import PasswordViewer from "../PasswordViewer";
 import toast from "react-hot-toast";
 
 import { useDraggable } from "@dnd-kit/core";

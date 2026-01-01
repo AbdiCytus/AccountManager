@@ -2,7 +2,7 @@
 "use client";
 
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import Portal from "./Portal";
+import Portal from "../Portal";
 
 type Props = {
   isOpen: boolean;
@@ -13,10 +13,10 @@ type Props = {
   confirmText?: string;
   cancelText?: string;
   isLoading?: boolean;
-  isDanger?: boolean; // Opsi untuk warna tombol merah
+  isDanger?: boolean;
 };
 
-export default function ConfirmationModal({
+export default function SelectConfirmationModal({
   isOpen,
   onClose,
   onConfirm,

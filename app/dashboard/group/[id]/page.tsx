@@ -3,8 +3,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
-import { prisma }from "@/lib/prisma"; // Pastikan path prisma client benar
-import GroupDetailClient from "@/components/GroupDetailClient"; // Import komponen baru
+import { prisma } from "@/lib/prisma"; // Pastikan path prisma client benar
+import GroupClient from "@/components/GroupClient";
+import GroupHeader from "@/components/GroupHeader";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -13,7 +14,6 @@ export default async function GroupDetailPage(props: Props) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  // 1. Ambil data group
   const group = await prisma.accountGroup.findUnique({
     where: {
       id: params.id,
@@ -23,8 +23,6 @@ export default async function GroupDetailPage(props: Props) {
 
   if (!group) notFound();
 
-  // 2. Ambil data akun di dalam group (sama seperti logic sebelumnya di getGroupById)
-  // Kita fetch terpisah agar tipenya mudah dicocokkan dengan GroupDetailClient props
   const accounts = await prisma.savedAccount.findMany({
     where: {
       groupId: params.id,
@@ -37,11 +35,13 @@ export default async function GroupDetailPage(props: Props) {
     orderBy: { createdAt: "desc" },
   });
 
-  // Render Client Component (Struktur layout container tetap disini)
   return (
     <div className="p-4 sm:p-8 min-h-screen bg-gray-50 dark:bg-black">
       <div className="max-w-5xl mx-auto">
-        <GroupDetailClient group={group} accounts={accounts} />
+        <div className="space-y-8">
+          <GroupHeader group={group} />
+          <GroupClient group={group} accounts={accounts} />
+        </div>
       </div>
     </div>
   );

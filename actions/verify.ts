@@ -15,9 +15,9 @@ export async function sendVerificationEmail(emailId: string) {
       where: { id: emailId, userId: session.user.id },
     });
 
-    if (!emailData) return { success: false, message: "Email tidak ditemukan" };
+    if (!emailData) return { success: false, message: "Email Not Found" };
     if (emailData.isVerified)
-      return { success: false, message: "Email sudah terverifikasi" };
+      return { success: false, message: "Email Already Verified" };
 
     // --- LOGIKA RATE LIMIT (MAX 3X PER HARI) ---
     const now = new Date();
@@ -32,7 +32,7 @@ export async function sendVerificationEmail(emailId: string) {
     if (attempts >= 3) {
       return {
         success: false,
-        message: "Batas verifikasi harian telah habis",
+        message: "Verification Limit Has Been Reached, Try Again Tomorrow",
       };
     }
 
@@ -65,28 +65,28 @@ export async function sendVerificationEmail(emailId: string) {
     await transporter.sendMail({
       from: `"Account Manager" <${process.env.SMTP_EMAIL}>`,
       to: emailData.email,
-      subject: "Verifikasi Email Anda",
+      subject: "Verified Your Email",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="color: #2563EB;">Verifikasi Email</h2>
-          <p>Halo <b>${emailData.name || "Pengguna"}</b>,</p>
-          <p>Sistem kami menerima permintaan untuk memverifikasi alamat email ini: <b>${
+          <h2 style="color: #2563EB;">Email Verification</h2>
+          <p>Hello, <b>${emailData.name || "User"}</b>,</p>
+          <p>Our system received a request to verify your email address: <b>${
             emailData.email
           }</b>.</p>
-          <p>Silakan klik tombol di bawah ini untuk memverifikasi:</p>
-          <a href="${verifyLink}" style="display: inline-block; background-color: #2563EB; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verifikasi Sekarang</a>
-          <p>Link ini hanya berlaku selama <b>24 jam</b>.</p>
-          <p style="margin-top: 20px; font-size: 12px; color: #888;">Jika Anda tidak merasa melakukan ini, abaikan saja email ini.</p>
+          <p>Please click the button below to verify:</p>
+          <a href="${verifyLink}" style="display: inline-block; background-color: #2563EB; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verified Now</a>
+          <p>This link only valid for <b>24 hours</b>.</p>
+          <p style="margin-top: 20px; font-size: 12px; color: #888;">If this is not you, you can ignore this email.</p>
         </div> `,
     });
 
     return {
       success: true,
-      message: `Link verifikasi dikirim!`,
+      message: `Verification Link Has Been Sent`,
     };
   } catch (error) {
     console.error(error);
-    return { success: false, message: "Gagal mengirim email." };
+    return { success: false, message: "Failed send email" };
   }
 }
 
@@ -97,13 +97,13 @@ export async function verifyEmailToken(token: string) {
       where: { verificationToken: token },
     });
 
-    if (!emailData) return { success: false, message: "Token tidak valid." };
+    if (!emailData) return { success: false, message: "Invalid Token" };
 
     // --- CEK EXPIRY ---
     if (emailData.tokenExpiresAt && new Date() > emailData.tokenExpiresAt) {
       return {
         success: false,
-        message: "Link verifikasi sudah kadaluarsa (Expired).",
+        message: "Link Expired",
       };
     }
 
@@ -118,9 +118,9 @@ export async function verifyEmailToken(token: string) {
       },
     });
 
-    return { success: true, message: "Email berhasil diverifikasi!" };
+    return { success: true, message: "Email Verified Successfully" };
   } catch (error) {
     console.error(error);
-    return { success: false, message: "Terjadi kesalahan sistem." };
+    return { success: false, message: "System Error" };
   }
 }

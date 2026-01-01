@@ -12,15 +12,15 @@ import {
 import toast from "react-hot-toast";
 
 // Sub-components
-import AccountCard from "./AccountCard";
-import GroupCard from "./GroupCard";
-import EmailCard from "./EmailCard";
-import ConfirmationModal from "./ConfirmationModal";
+import AccountCard from "./cards/AccountCard";
+import GroupCard from "./cards/GroupCard";
+import EmailCard from "./cards/EmailCard";
+import ConfirmationModal from "./modals/ConfirmationModal";
 import DashboardToolbar from "./dashboard/DashboardToolbar";
 import PaginationControl from "./dashboard/PaginationControl";
 import SectionWithSelect from "./dashboard/SectionWithSelect";
 import SelectGroupModal from "./dashboard/SelectGroupModal";
-import AddDataModal from "./AddDataModal";
+import AddDataModal from "./modals/AddDataModal";
 
 import {
   DndContext,

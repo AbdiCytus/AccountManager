@@ -11,19 +11,19 @@ import {
   CodeBracketIcon,
 } from "@heroicons/react/24/solid";
 import Tooltip from "@/components/ui/Tooltip";
-import ImportModal from "./ImportModal";
+import ImportModal from "../modals/ImportModal";
 import { getExportData } from "@/actions/import-export";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import toast from "react-hot-toast";
 
 type Props = {
-  variant: "dashboard" | "group" | "account"; // Tambah 'account'
+  variant: "dashboard" | "group" | "account";
   scope: "all" | "group" | "single";
   id?: string;
 };
 
-export default function HeaderActionMenu({ variant, scope, id }: Props) {
+export default function ImportExportMenu({ variant, scope, id }: Props) {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isExportLoading, setIsExportLoading] = useState(false);
 

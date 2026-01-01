@@ -9,7 +9,7 @@ import {
   TrashIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import Portal from "./Portal";
+import Portal from "@/components/Portal";
 
 type DeleteProps = {
   isOpen: boolean;

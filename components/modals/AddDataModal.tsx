@@ -16,7 +16,7 @@ import { addEmail } from "@/actions/email";
 import { addAccount } from "@/actions/account";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import Portal from "./Portal";
+import Portal from "../Portal";
 
 interface Props {
   existingEmails: { id: string; email: string }[];

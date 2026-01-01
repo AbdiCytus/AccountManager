@@ -9,7 +9,7 @@ import {
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
-import Portal from "./Portal";
+import Portal from "@/components/Portal";
 
 export default function DeleteGroupButton({ id }: { id: string }) {
   const router = useRouter();
