@@ -36,7 +36,7 @@ export default function LoginPage() {
             Welcome
           </h2>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-           Manage all your accounts to safe place with just one login
+            Manage all your accounts to safe place with just one login
           </p>
         </div>
 
