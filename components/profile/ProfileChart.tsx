@@ -113,7 +113,7 @@ export default function ProfileChart({ categoryData, totalAccounts }: Props) {
   // 4. Handle State Kosong
   if (data.length === 0) {
     return (
-      <div className="w-full h-75 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/50">
+      <div className="w-full h-61 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/50">
         <p className="text-sm">Data Not Found</p>
       </div>
     );
