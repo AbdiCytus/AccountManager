@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛡️ Account Manager
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_4-cyan?style=for-the-badge&logo=tailwindcss)
+![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=for-the-badge&logo=prisma)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql)
 
-First, run the development server:
+> **Master Your Digital Identity.**
+> A secure, modern, and minimalist vault to manage your credentials, email identities, and digital footprint.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📖 About The Project
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Accault** is a personal digital vault designed to solve the chaos of scattered passwords and forgotten accounts. Unlike traditional password managers, it focuses on the **relationships between your data**—tracking which email is linked to which service, organizing accounts into groups, and providing visual analytics of your digital life.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Built with the latest web technologies, it offers bank-grade security with a beautiful, responsive user interface.
 
-## Learn More
+### ✨ Key Features
 
-To learn more about Next.js, take a look at the following resources:
+- **🔐 Bank-Grade Security:** All sensitive data (passwords) are encrypted using industry-standard AES algorithms before storage.
+- **📊 Smart Analytics:** Visualize your account distribution with interactive charts and track your recent activities.
+- **📂 Organized Vault:** Group your accounts (e.g., Work, Social, Gaming) and link them to specific Email Identities.
+- **🌍 Multi-Language Support:** Fully localized in **English** and **Indonesian**, with persistent language preferences.
+- **📥 Import & Export:** Full control over your data. Backup your vault to Excel or migrate data easily.
+- **🌗 Dark Mode:** A stunning dark interface for late-night management, fully integrated with system preferences.
+- **⚡ Modern UX:** Skeleton loading, glassmorphism effects, and smooth transitions powered by Framer Motion.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
