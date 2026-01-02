@@ -66,11 +66,8 @@ export default function AboutPage() {
           </div>
 
           {/* Kolom Ilustrasi (Sticky agar tetap terlihat saat scroll) */}
-          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-96 flex items-center justify-center text-gray-400 dark:text-gray-500 sticky top-24">
-            {/* Anda bisa mengganti ini dengan komponen <Image /> nanti */}
-            <div className="text-center p-6">
-              <span className="font-medium text-lg">Illust / Image</span>
-            </div>
+          <div className="bg-gray-200 dark:bg-gray-800 border dark:border-gray-800 rounded-2xl max-h-max flex items-center justify-center text-gray-400 dark:text-gray-500 sticky top-24">
+            <Image src="/images/profile-prev.png" alt="profile-page" width={2000} height={2000} className="w-full h-full object-fit sticky rounded-2xl" />
           </div>
         </div>
 
