@@ -84,7 +84,7 @@ export default function ImportExportMenu({ variant, scope, id }: Props) {
         </button>
 
         {/* --- 2. DROPDOWN CONTAINER --- */}
-        <div className="absolute right-0 top-full pt-1.5 hidden group-hover:flex flex-col items-end animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="absolute right-0 top-full pt-1.5 hidden group-focus-within:flex group-hover:flex flex-col items-end animate-in fade-in slide-in-from-top-1 duration-200">
           {/* --- 3. ACTUAL MENU BOX --- */}
           <div className="bg-white dark:bg-gray-800 p-1.5 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 flex flex-col gap-1 w-max">
             {/* ITEM 1: EXPORT OPTIONS */}
