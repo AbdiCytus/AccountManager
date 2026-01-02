@@ -64,7 +64,7 @@ export async function sendVerificationEmail(emailId: string) {
     const verifyLink = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
 
     await transporter.sendMail({
-      from: `"Account Manager" <${process.env.SMTP_EMAIL}>`,
+      from: `"Accault" <${process.env.SMTP_EMAIL}>`,
       to: emailData.email,
       subject: "Verified Your Email",
       html: `

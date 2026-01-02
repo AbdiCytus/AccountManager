@@ -94,7 +94,7 @@ export default function LoginPage() {
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-400 dark:text-gray-500">
             This web has protected & secure <br />
-            &copy; {new Date().getFullYear()} Account Manager
+            &copy; {new Date().getFullYear()} Accault
           </p>
         </div>
       </div>

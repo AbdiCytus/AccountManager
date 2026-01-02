@@ -46,9 +46,21 @@ export default function Navbar() {
                 <span className="text-white font-bold text-xl">A</span>
               </div>
               <span className="font-bold text-xl text-gray-800 dark:text-white tracking-tight">
-                Account<span className="text-blue-600">Manager</span>
+                Acc<span className="text-blue-600">ault</span>
               </span>
             </Link>
+            <div className="hidden md:flex items-center gap-6 mx-10">
+              <Link
+                href="/about"
+                className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                About
+              </Link>
+              <Link
+                href="/help"
+                className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                Help
+              </Link>
+            </div>
           </div>
 
           <div className="flex items-center gap-4" ref={dropdownRef}>

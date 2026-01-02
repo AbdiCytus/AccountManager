@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Account Manager",
-  description: "Remember One, Access Many",
+  title: "Accault",
+  description: "Remember One, Access All",
 };
 
 type Props = Readonly<{ children: React.ReactNode }>;
@@ -40,6 +40,7 @@ export default function RootLayout({ children }: Props) {
             }}
           />
           <main>{children}</main>
+          <div className="bg-gray-200 dark:bg-gray-800 w-full h-1"></div>
           <Footer />
         </Providers>
       </body>
