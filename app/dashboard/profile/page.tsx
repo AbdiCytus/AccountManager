@@ -2,6 +2,8 @@
 import { getProfileStats } from "@/actions/profile";
 import ProfileChart from "@/components/profile/ProfileChart";
 import { redirect } from "next/navigation";
+import ClearHistoryButton from "@/components/profile/ClearHistoryButton";
+import StatsProgress from "@/components/profile/StatsProgress";
 import Image from "next/image";
 import {
   ClockIcon,
@@ -9,16 +11,16 @@ import {
   RectangleStackIcon, // Ikon untuk Akun
   EnvelopeIcon, // Ikon untuk Email
   RectangleGroupIcon, // Ikon untuk Grup
+  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
+import Tooltip from "@/components/ui/Tooltip";
 
 export default async function ProfilePage() {
   const data = await getProfileStats();
 
-  if (!data) {
-    redirect("/login");
-  }
+  if (!data) redirect("/login");
 
-  const { user, stats, logs } = data;
+  const { user, stats, logs, chartData } = data;
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("id-ID", {
@@ -63,12 +65,12 @@ export default async function ProfilePage() {
                 </div>
               </div>
 
-              {/* STATISTIK HORIZONTAL (Dengan Ikon) */}
+              {/* STATISTIK HORIZONTAL */}
               <div className="grid grid-cols-3 gap-2 mb-2">
                 {/* Total Akun */}
                 <div className="flex flex-col text-center gap-2 items-center justify-center p-2 rounded-lg bg-gray-50 dark:bg-gray-800 transition-colors group">
                   <span className="text-[12px] uppercase text-gray-500 font-semibold">
-                    Accounts
+                    Account
                   </span>
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full mb-1 group-hover:scale-110 transition-transform">
@@ -83,7 +85,7 @@ export default async function ProfilePage() {
                 {/* Total Email */}
                 <div className="flex flex-col text-center gap-2 items-center justify-center p-2 rounded-lg bg-gray-50 dark:bg-gray-800 transition-colors group">
                   <span className="text-[12px] uppercase text-gray-500 font-semibold">
-                    Emails
+                    Email
                   </span>
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full mb-1 group-hover:scale-110 transition-transform">
@@ -98,7 +100,7 @@ export default async function ProfilePage() {
                 {/* Total Grup */}
                 <div className="flex flex-col text-center gap-2 items-center justify-center p-2 rounded-lg bg-gray-50 dark:bg-gray-800 transition-colors group">
                   <span className="text-[12px] uppercase text-gray-500 font-semibold">
-                    Groups
+                    Group
                   </span>
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full mb-1 group-hover:scale-110 transition-transform">
@@ -111,17 +113,27 @@ export default async function ProfilePage() {
                 </div>
               </div>
 
-              {/* 2. RIWAYAT AKTIVITAS (Dipindah ke Kiri) */}
-              <div className="flex items-center gap-3 mt-5 mb-4 py-4 border-y border-gray-100 dark:border-gray-800">
-                <div className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <ClockIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              {/* 2. RIWAYAT AKTIVITAS */}
+              <div className="flex items-center justify-between mt-5 mb-4 py-4 border-y border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <ClockIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <h2 className="text-base font-bold uppercase text-gray-900 dark:text-white">
+                    Activity
+                  </h2>
                 </div>
-                <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                  Recent Activity
-                </h2>
+                <div className="flex items-center gap-2">
+                  <Tooltip
+                    text="Displays data for the last 30 days"
+                    position="top">
+                    <InformationCircleIcon className="h-5 w-5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" />
+                  </Tooltip>
+                  <ClearHistoryButton />
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="max-h-61 overflow-y-auto pr-2 scroll-smooth custom-scrollbar">
                 {logs.length === 0 ? (
                   <div className="text-center text-gray-400 py-10 text-sm">
                     No Activity
@@ -151,7 +163,7 @@ export default async function ProfilePage() {
                           <p className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-snug">
                             {log.details || log.action}
                           </p>
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 w-fit">
+                          <span className="text-[10px] px-2 py-0.5 mt-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 w-fit">
                             {log.entity}
                           </span>
                         </div>
@@ -165,7 +177,6 @@ export default async function ProfilePage() {
 
           {/* --- KOLOM KANAN (Width: 8/12) --- */}
           <div className="lg:col-span-8">
-            {/* KARTU CHART (Sekarang lebih lebar) */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 h-full min-h-125 flex flex-col">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-3">
@@ -173,19 +184,24 @@ export default async function ProfilePage() {
                     <ChartBarIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
+                    {/* Ubah Judul agar sesuai konteks */}
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                      Analitik Penyimpanan
+                      Account Distribution
                     </h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Visualisasi distribusi data akun Anda
+                      Visualisation of accounts by category
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Area Grafik */}
-              <div className="flex-1 w-full min-h-100">
-                <ProfileChart stats={stats} />
+              <div className="flex-1 w-full min-h-60">
+                <ProfileChart
+                  categoryData={chartData}
+                  totalAccounts={stats.accounts}
+                />
+                <StatsProgress stats={stats} />
               </div>
             </div>
           </div>
