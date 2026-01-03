@@ -13,7 +13,7 @@ export default function ActionMenu({ children }: { children: ReactNode }) {
       </div>
 
       {/* State 2: Tampilkan Tombol Aksi (Hover) */}
-      <div className="hidden group-focus-within:flex group-hover:flex items-center duration-300 transition-all gap-2 p-0.5 animate-in slide-in-from-right-2 fade-in">
+      <div className="hidden group-focus:flex group-hover:flex items-center duration-300 transition-all gap-2 p-0.5 animate-in slide-in-from-right-2 fade-in">
         {children}
       </div>
     </div>
