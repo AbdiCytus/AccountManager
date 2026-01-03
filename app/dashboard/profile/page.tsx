@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import ClearHistoryButton from "@/components/profile/ClearHistoryButton";
 import StatsProgress from "@/components/profile/StatsProgress";
 import Image from "next/image";
+import LogDate from "@/components/profile/LogDate";
 import {
   ClockIcon,
   ChartBarIcon,
@@ -21,13 +22,6 @@ export default async function ProfilePage() {
   if (!data) redirect("/login");
 
   const { user, stats, logs, chartData } = data;
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("id-ID", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(date));
-  };
 
   return (
     <div className="p-4 sm:p-8 min-h-screen bg-gray-50 dark:bg-black text-gray-800 dark:text-gray-100">
@@ -158,7 +152,7 @@ export default async function ProfilePage() {
 
                         <div className="flex flex-col space-y-1">
                           <span className="text-xs text-gray-400 font-mono">
-                            {formatDate(log.createdAt)}
+                            <LogDate date={log.createdAt} />
                           </span>
                           <p className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-snug">
                             {log.details || log.action}

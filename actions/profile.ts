@@ -4,7 +4,7 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { revalidatePath } from "next/cache"; // Import revalidatePath
+import { revalidatePath } from "next/cache";
 
 export async function getProfileStats() {
   const session = await getServerSession(authOptions);
@@ -12,34 +12,48 @@ export async function getProfileStats() {
 
   const userId = session.user.id;
 
-  // 1. Ambil Semua Statistik dalam satu Promise.all agar efisien
+  // --- Ambil semua log 30 hari terakhir ---
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  // 1. Hapus Log yang lebih tua dari 30 hari (Auto Delete)
+  await prisma.activityLog.deleteMany({
+    where: {
+      userId,
+      createdAt: {
+        lt: thirtyDaysAgo, // Less than (lebih tua dari) 30 hari lalu
+      },
+    },
+  });
+
+  // 2. Ambil Semua Statistik
   const [
     totalAccounts,
-    connectedAccounts, // Baru
+    connectedAccounts,
     totalEmails,
-    verifiedEmails, // Baru
+    verifiedEmails,
     totalGroups,
     logs,
   ] = await Promise.all([
-    // Hitung Total Akun
     prisma.savedAccount.count({ where: { userId } }),
-    // Hitung Akun yg Punya Email (emailId tidak null)
     prisma.savedAccount.count({ where: { userId, emailId: { not: null } } }),
-
-    // Hitung Total Email
     prisma.emailIdentity.count({ where: { userId } }),
-    // Hitung Email yg Terverifikasi (isVerified = true)
     prisma.emailIdentity.count({ where: { userId, isVerified: true } }),
-
     prisma.accountGroup.count({ where: { userId } }),
+
+    // Query Log Diperbarui
     prisma.activityLog.findMany({
-      where: { userId },
+      where: {
+        userId,
+        createdAt: {
+          gte: thirtyDaysAgo,
+        },
+      },
       orderBy: { createdAt: "desc" },
-      take: 20,
     }),
   ]);
 
-  // 2. Ambil Data Kategori (Tetap sama)
+  // 3. Ambil Data Kategori (Sama seperti sebelumnya)
   const accounts = await prisma.savedAccount.findMany({
     where: { userId },
     select: { categories: true },
@@ -56,9 +70,9 @@ export async function getProfileStats() {
     user: session.user,
     stats: {
       accounts: totalAccounts,
-      connectedAccounts, // Kirim data baru
+      connectedAccounts,
       emails: totalEmails,
-      verifiedEmails, // Kirim data baru
+      verifiedEmails,
       groups: totalGroups,
     },
     chartData: categoryStats,
@@ -66,7 +80,6 @@ export async function getProfileStats() {
   };
 }
 
-// --- ACTION BARU: CLEAR ALL LOGS ---
 export async function clearAllActivities() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { success: false, message: "Unauthorized" };
