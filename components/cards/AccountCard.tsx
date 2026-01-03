@@ -70,6 +70,9 @@ export default function AccountCard({
       ? "none"
       : "transform 200ms ease-in-out, opacity 200ms ease-in-out, box-shadow 200ms ease-in-out",
     cursor: isDragging ? "grabbing" : undefined,
+    WebkitTouchCallout: "none",
+    WebkitUserSelect: "none",
+    userSelect: "none",
   };
 
   const handleRemoveGroup = async (e: React.MouseEvent) => {

@@ -27,6 +27,7 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  MouseSensor,
   TouchSensor,
 } from "@dnd-kit/core";
 
@@ -384,8 +385,13 @@ export default function DashboardClient({
 
   // --- DND LOGIC ---
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor)
+    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5, // Toleransi gerakan jari sedikit saat menahan
+      },
+    })
   );
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
