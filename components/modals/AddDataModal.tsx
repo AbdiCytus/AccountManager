@@ -10,6 +10,8 @@ import {
   MagnifyingGlassIcon,
   TrashIcon,
   InformationCircleIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import { addGroup } from "@/actions/group";
 import { addEmail } from "@/actions/email";
@@ -41,6 +43,8 @@ export default function AddDataModal({
 
   const [activeTab, setActiveTab] = useState<TabOption>("account");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [showAccountPassword, setShowAccountPassword] = useState(false);
 
   // --- LOGIKA HYBRID (CONTROLLED VS UNCONTROLLED) ---
   const isControlled = externalIsOpen !== undefined;
@@ -148,6 +152,7 @@ export default function AddDataModal({
     setEmailSearch("");
     setSelectedEmailId("");
     setActiveTab("account");
+    setShowAccountPassword(false);
   }
 
   const getModalWidth = () => {
@@ -381,11 +386,25 @@ export default function AddDataModal({
                           </label>
                         </div>
                         {!noPassword && (
-                          <input
-                            type="password"
-                            name="password"
-                            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                          />
+                          <div className="relative">
+                            <input
+                              type={showAccountPassword ? "text" : "password"} // Gunakan state toggle
+                              name="password"
+                              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowAccountPassword(!showAccountPassword)
+                              }
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none">
+                              {showAccountPassword ? (
+                                <EyeSlashIcon className="w-5 h-5" />
+                              ) : (
+                                <EyeIcon className="w-5 h-5" />
+                              )}
+                            </button>
+                          </div>
                         )}
                       </div>
                       <div className="space-y-1">
@@ -489,7 +508,7 @@ export default function AddDataModal({
                       />
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                         Note
+                          Note
                         </label>
                         <textarea
                           name="description"
@@ -764,19 +783,44 @@ function InputLabel({
   placeholder,
   required = false,
 }: InputLabelProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPasswordType = type === "password";
+
+  const actualType = isPasswordType
+    ? showPassword
+      ? "text"
+      : "password"
+    : type;
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         {label}
         {required && <span className="text-red-500">*</span>}
       </label>
-      <input
-        name={name}
-        type={type}
-        required={required}
-        placeholder={placeholder}
-        className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-      />
+      <div className="relative">
+        <input
+          name={name}
+          type={actualType}
+          required={required}
+          placeholder={placeholder}
+          className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors pr-10" // Tambah padding kanan (pr-10)
+        />
+        {/* Tombol Mata (Hanya muncul jika tipe aslinya password) */}
+        {isPasswordType && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none"
+            tabIndex={-1} // Agar tidak bisa difokuskan lewat tab keyboard
+          >
+            {showPassword ? (
+              <EyeSlashIcon className="w-5 h-5" />
+            ) : (
+              <EyeIcon className="w-5 h-5" />
+            )}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

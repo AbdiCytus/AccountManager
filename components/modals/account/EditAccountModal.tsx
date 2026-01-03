@@ -9,6 +9,8 @@ import {
   PencilSquareIcon,
   MagnifyingGlassIcon,
   TrashIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -52,6 +54,8 @@ export default function EditAccountModal({
   const [groupSearch, setGroupSearch] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState(account.groupId || "");
   const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const CATEGORIES = ["Social", "Game", "Work", "Finance", "Other"];
@@ -247,13 +251,27 @@ export default function EditAccountModal({
                           Without Password
                         </label>
                       </div>
+
                       {!noPassword && (
-                        <input
-                          type="password"
-                          name="password"
-                          placeholder="Fill to change password..."
-                          className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Fill to change password..."
+                            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none"
+                            tabIndex={-1}>
+                            {showPassword ? (
+                              <EyeSlashIcon className="w-5 h-5" />
+                            ) : (
+                              <EyeIcon className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
                       )}
                     </div>
 

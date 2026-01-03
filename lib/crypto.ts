@@ -21,10 +21,15 @@ export const encrypt = (text: string) => {
 };
 
 export const decrypt = (text: string) => {
+  if (text.startsWith("ENC_")) return text.replace("ENC_", "");
+
   const textParts = text.split(":");
 
   const ivHex = textParts.shift();
   if (!ivHex) throw new Error("Format data enkripsi salah/rusak");
+
+  if (textParts.length === 0)
+    throw new Error("Format data enkripsi tidak valid");
 
   const iv = Buffer.from(ivHex, "hex");
   const encryptedText = Buffer.from(textParts.join(":"), "hex");

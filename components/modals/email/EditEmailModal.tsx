@@ -9,6 +9,8 @@ import {
   XMarkIcon,
   MagnifyingGlassIcon,
   ExclamationTriangleIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import Portal from "@/components/Portal";
@@ -18,10 +20,7 @@ type Props = {
   otherEmails: { id: string; email: string }[];
 };
 
-export default function EditEmailModal({
-  emailData,
-  otherEmails,
-}: Props) {
+export default function EditEmailModal({ emailData, otherEmails }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +42,8 @@ export default function EditEmailModal({
 
   const recoveryOptions = otherEmails.filter((e) => e.id !== emailData.id);
   const isEmailChanged = inputEmail !== emailData.email;
+
+  const [showPassword, setShowPassword] = useState(false);
 
   // 1. HANDLER PERTAMA: Saat tombol "Simpan" diklik
   async function handlePreSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -86,6 +87,7 @@ export default function EditEmailModal({
     setInputEmail(emailData.email);
     setIs2FA(emailData.is2FAEnabled);
     setShowConfirmation(false);
+    setShowPassword(false);
     setIsOpen(true);
   };
 
@@ -133,7 +135,7 @@ export default function EditEmailModal({
                       <span>
                         {isEmailChanged ? (
                           <>
-                            <b>Warning!</b> Changing email address will {" "}
+                            <b>Warning!</b> Changing email address will{" "}
                             <strong>remove</strong> verified status
                           </>
                         ) : (
@@ -189,12 +191,25 @@ export default function EditEmailModal({
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             New Password
                           </label>
-                          <input
-                            name="password"
-                            type="password"
-                            placeholder="Fill to change password..."
-                            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                          />
+                          <div className="relative">
+                            <input
+                              name="password"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Fill to change password..."
+                              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none"
+                              tabIndex={-1}>
+                              {showPassword ? (
+                                <EyeSlashIcon className="w-5 h-5" />
+                              ) : (
+                                <EyeIcon className="w-5 h-5" />
+                              )}
+                            </button>
+                          </div>
                         </div>
 
                         {/* 2FA Checkbox */}
@@ -227,7 +242,8 @@ export default function EditEmailModal({
                             <div className="space-y-4">
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                  Telephone Number<span className="text-red-500">*</span>
+                                  Telephone Number
+                                  <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                   name="phoneNumber"
@@ -242,7 +258,8 @@ export default function EditEmailModal({
                               {/* SEARCHABLE DROPDOWN RECOVERY */}
                               <div className="space-y-1">
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                  Email Recovery<span className="text-red-500">*</span>
+                                  Email Recovery
+                                  <span className="text-red-500">*</span>
                                 </label>
                                 <SearchableEmailDropdown
                                   emails={recoveryOptions}
@@ -300,11 +317,11 @@ export default function EditEmailModal({
                     </p>
                     <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-300">
                       <li>
-                       Change email from <b>{emailData.email}</b> to{" "}
+                        Change email from <b>{emailData.email}</b> to{" "}
                         <b>{inputEmail}</b>.
                       </li>
                       <li className="text-red-600 dark:text-red-400 font-bold">
-                        {'Remove verified status'}
+                        {"Remove verified status"}
                       </li>
                       <li>You must verified again manually</li>
                     </ul>

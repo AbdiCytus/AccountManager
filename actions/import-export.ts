@@ -8,9 +8,7 @@ import { revalidatePath } from "next/cache";
 import type { AccountExportData, ImportRowData } from "@/types/import-export";
 import { Prisma } from "@/app/generated/prisma/client"; // Import tipe Prisma
 import { logActivity } from "@/lib/logger";
-
-// --- MOCKUP ENKRIPSI ---
-const encryptPassword = (plain: string) => `ENC_${plain}`;
+import { encrypt, decrypt } from "@/lib/crypto";
 
 // ---------------------------------------------------------
 // 1. ACTION EXPORT
@@ -43,22 +41,39 @@ export async function getExportData(
       orderBy: { createdAt: "desc" },
     });
 
-    const formattedData: AccountExportData[] = accounts.map((acc) => ({
-      platformName: acc.platformName,
-      username: acc.username,
-      password: acc.encryptedPassword,
-      email: acc.emailIdentity?.email || null,
-      group: acc.group?.name || null,
-      categories: acc.categories.join(", "),
-      website: acc.website || null,
-      description: acc.description || null,
-    }));
+    const formattedData: AccountExportData[] = accounts.map((acc) => {
+      let plainPassword = null;
+      if (acc.encryptedPassword) {
+        try {
+          plainPassword = decrypt(acc.encryptedPassword);
+        } catch (error) {
+          console.error(
+            `Password Failed to Encrypt: ${acc.platformName}`,
+            error
+          );
+          plainPassword = "";
+        }
+      }
+
+      return {
+        platformName: acc.platformName,
+        username: acc.username,
+        password: plainPassword,
+        email: acc.emailIdentity?.email || null,
+        group: acc.group?.name || null,
+        categories: acc.categories.join(", "),
+        website: acc.website || null,
+        description: acc.description || null,
+      };
+    });
 
     await logActivity(
       session.user.id,
       "CREATE",
       "Account",
-      `${accounts.length} ${scope === "single" ? "Account" : "Accounts"} Exported`
+      `${accounts.length} ${
+        scope === "single" ? "Account" : "Accounts"
+      } Exported`
     );
     return { success: true, data: formattedData };
   } catch (error) {
@@ -128,9 +143,7 @@ export async function importAccounts(
           userId: session.user.id,
           platformName: row.platformName,
           username: row.username,
-          encryptedPassword: row.password
-            ? encryptPassword(row.password)
-            : null,
+          encryptedPassword: row.password ? encrypt(row.password) : null,
           website: row.website,
           description: row.description,
           categories: categoriesArray,
