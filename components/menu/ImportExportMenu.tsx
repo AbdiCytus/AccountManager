@@ -102,7 +102,7 @@ export default function ImportExportMenu({ variant, scope, id }: Props) {
               </Tooltip>
 
               {/* SUBMENU EXPORT */}
-              <div className="absolute right-full top-0 pr-2 hidden group-hover/export:flex items-start">
+              <div className="absolute right-full top-0 pr-2 hidden group-focus-within/export:flex group-hover/export:flex items-start">
                 <div className="flex flex-col gap-1 bg-white dark:bg-gray-800 p-1.5 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 w-32 animate-in fade-in slide-in-from-right-2">
                   <button
                     onClick={() => handleExport("excel")}

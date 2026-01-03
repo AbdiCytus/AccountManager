@@ -127,7 +127,7 @@ export default async function ProfilePage() {
                   <Tooltip
                     text="Displays data for the last 30 days"
                     position="top">
-                    <InformationCircleIcon className="h-5 w-5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" />
+                    <InformationCircleIcon className="h-5 w-5 text-gray-400 hover:text-blue-600 focus-within:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all focus-within:bg-blue-50 dark:focus-within::bg-blue-900/20" />
                   </Tooltip>
                   <ClearHistoryButton />
                 </div>
